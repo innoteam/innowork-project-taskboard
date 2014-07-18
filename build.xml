@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+  =======================================================================
+
+   Innowork-Projects build file
+
+   Copyright (c) 2008-2014 Innoteam Srl. All rights reserved.
+
+  =======================================================================
+-->
+<project name="Innowork Projects" default="package">
+
+	<property name="name" value="innowork-projects" />
+	<property name="version" value="1.4.0" />
+
+	<target name="sources">
+		<tar destfile="${basedir}/build/${name}-src-${version}.tgz" compression="gzip">
+			<tarfileset dir="${basedir}/source" prefix="${name}-src-${version}">
+				<exclude name="**/.svn/**" />
+				<exclude name=".cache/**" />
+			</tarfileset>
+		</tar>
+	</target>
+
+	<target name="package">
+		<tar destfile="${basedir}/build/${name}-${version}.tgz" compression="gzip">
+			<tarfileset dir="${basedir}/source" prefix="${name}-${version}">
+				<exclude name="**/.cvsignore" />
+				<exclude name="**/.svn/**" />
+				<exclude name="build/**" />
+				<exclude name="nbproject/**" />
+				<exclude name="project.index" />
+				<exclude name=".project" />
+				<exclude name=".settings/**" />
+				<exclude name=".cache/**" />
+				<exclude name="build.xml" />
+			</tarfileset>
+		</tar>
+	</target>
+
+</project>

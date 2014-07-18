@@ -1,0 +1,116 @@
+<?xml version='1.0'?>
+<application>
+
+	<definition>
+		<idname>innowork-projects</idname>
+		<release>
+			<version>1.4.0</version>
+			<date>2014/02/02</date>
+			<changesfile>CHANGES</changesfile>
+		</release>
+		<description>Innowork Projects</description>
+		<category>intranet</category>
+		<iconfile></iconfile>
+		<dependencies>
+            <dependency>innomatic[6.4.0]</dependency>
+			<dependency>innowork-core[3.4.0]</dependency>
+            <dependency>innowork-groupware</dependency>
+			<dependency>phplotlib[5.0-3]</dependency>
+            <dependency>innowork-billing[2.1.0]</dependency>
+            <dependency>innowork-timesheet-customer-reporting[1.0.0]</dependency>
+			<suggestion>innowork-timesheet</suggestion>
+		</dependencies>
+		<options>
+			<!-- <option></option> -->
+		</options>
+		<legal>
+			<author>
+				<name>Innoteam Srl</name>
+				<email>info@innoteam.it</email>
+				<web>http://www.innoteam.it/</web>
+			</author>
+			<copyright>Copyright (c) 2002-2014 Innoteam Srl</copyright>
+			<license>Commercial</license>
+			<licensefile>LICENSE</licensefile>
+		</legal>
+		<support>
+			<supportemail>helpdesk@innoteam.it</supportemail>
+			<bugsemail>helpdesk@innoteam.it</bugsemail>
+			<maintainer>
+				<name>Alex Pagnoni</name>
+				<email>alex.pagnoni@innoteam.it</email>
+			</maintainer>
+		</support>
+	</definition>
+
+	<components>
+
+		<domaingroup name="projects"
+			catalog="innowork-projects::projects_misc" />
+
+        <catalog name="innowork-projects" />
+
+		<!-- Projects -->
+
+		<domainpanel name="innoworkprojects" file="innoworkprojects.php"
+			category="projects" themeicon="plan" themeicontype="apps"
+			catalog="innowork-projects::projects_misc" />
+
+		<domainpanel name="innoworkprojectsprefs"
+			file="innoworkprojectsprefs.php" category="preferences"
+			themeicon="plan" themeicontype="apps"
+			catalog="innowork-projects::projects_misc" />
+
+		<domaintable name="innowork_projects"
+			file="innowork_projects.xml" />
+		<domaintable name="innowork_projects_fields_values"
+			file="innowork_projects_fields_values.xml" />
+
+		<class name="innowork/projects/InnoworkProject.php" />
+		<class name="innowork/projects/InnoworkProjectField.php" />
+
+		<innoworkitemtype name="project" file="project"
+			catalog="innowork-projects::projects_misc"
+			classfile="innowork/projects/InnoworkProject.php" classname="InnoworkProject"
+			icon="plan" icontype="apps" domainpanel="innoworkprojects"
+			miniicon="edit" summaryname="projects-name" showmode="list" />
+
+        <permission name="add_projects" title="add_projects" description="" catalog="innowork-projects::roles" defaultroles="accounting,seniormanager,projectmanager" />
+        <permission name="view_all_projects" title="view_all_projects" description="" catalog="innowork-projects::roles" defaultroles="accounting,seniormanager" />
+
+        <!-- Tasks -->
+
+        <domainpanel name="innoworktasks"
+            category="projects" themeicon="kword" themeicontype="apps"
+            catalog="innowork-projects::tasks_misc" />
+        <domainpanel name="innoworktasksprefs"
+            category="preferences"
+            themeicon="plan" themeicontype="apps"
+            catalog="innowork-projects::tasks_misc" />
+
+        <domaintable name="innowork_projects_tasks"
+            file="innowork_projects_tasks.xml" />
+        <domaintable name="innowork_projects_tasks_messages"
+            file="innowork_projects_tasks_messages.xml" />
+        <domaintable name="innowork_projects_tasks_fields_values"
+            file="innowork_projects_tasks_fields_values.xml" />
+
+        <class name="innowork/projects/InnoworkTask.php" />
+        <class name="innowork/projects/InnoworkTaskField.php" />
+
+        <innoworkitemtype name="task" file="task"
+            catalog="innowork-projects::tasks_misc"
+            classfile="innowork/projects/InnoworkTask.php" classname="InnoworkTask" icon="kword"
+            icontype="apps" domainpanel="innoworktasks"
+            miniicon="folder_txt" summaryname="task-name" showmode="list" />
+
+        <dashboardwidget
+            name="innoworkmytasks"
+            panel="innoworktasks"
+            file="InnoworkMyTasksDashboardWidget.php"
+            catalog="innowork-projects::tasks_dashboard"
+            title="mytasks"
+            class="\Shared\Dashboard\InnoworkMyTasksDashboardWidget" />
+
+	</components>
+</application>
