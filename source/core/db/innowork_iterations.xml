@@ -1,0 +1,14 @@
+<?xml version='1.0'?>
+<database>
+
+    <table name="innowork_iterations">
+        <field  name="id"   type="integer"  notnull="1"/>
+        <field  name="done" type="boolean"/>
+        <field  name="startdate" type="timestamp"/>
+        <field  name="enddate" type="timestamp"/>
+        <key    field="id"  type="unique"/>
+    </table>
+
+    <sequence name="innowork_iterations_id_seq"/>
+
+</database>

@@ -1,0 +1,9 @@
+<?xml version='1.0'?>
+<database>
+
+    <table name="innowork_iterations_projects">
+        <field  name="iterationid" type="integer"/>
+        <field  name="projectid" type="integer"/>
+    </table>
+
+</database>
