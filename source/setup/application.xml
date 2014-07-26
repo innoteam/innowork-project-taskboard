@@ -50,6 +50,8 @@
 
         <wuiwidget name="taskboard" file="WuiTaskboard.php" />
 
+        <domaintable name="innowork_taskboards"
+            file="innowork_taskboards.xml" />
         <domaintable name="innowork_iterations"
             file="innowork_iterations.xml" />
         <domaintable name="innowork_iterations_projects"

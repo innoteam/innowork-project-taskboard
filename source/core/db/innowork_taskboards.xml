@@ -1,0 +1,13 @@
+<?xml version='1.0'?>
+<database>
+
+    <table name="innowork_taskboards">
+        <field  name="id"   type="integer"  notnull="1"/>
+        <field  name="done" type="boolean"/>
+        <field  name="title" type="text"/>
+        <key    field="id"  type="unique"/>
+    </table>
+
+    <sequence name="innowork_taskboards_id_seq"/>
+
+</database>
