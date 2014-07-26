@@ -57,5 +57,11 @@
         <domaintable name="innowork_iterations_projects"
             file="innowork_iterations_projects.xml" />
 
+		<innoworkitemtype name="taskboard" file="taskboard"
+			catalog="innowork-projects-taskboard::misc"
+			classfile="innowork/taskboard/InnoworkTaskBoard.php" classname="InnoworkTaskBoard" icon="kword"
+			icontype="apps" domainpanel="innoworktaskboard"
+			miniicon="folder_txt" summaryname="taskboard-name" showmode="list" />
+
 	</components>
 </application>

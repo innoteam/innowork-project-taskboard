@@ -3,6 +3,8 @@
 
     <table name="innowork_taskboards">
         <field  name="id"   type="integer"  notnull="1"/>
+        <field  name="ownerid"  type="integer"  notnull="1"/>
+        <field  name="trashed"  type="boolean"/>
         <field  name="done" type="boolean"/>
         <field  name="title" type="text"/>
         <key    field="id"  type="unique"/>
