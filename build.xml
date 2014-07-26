@@ -2,16 +2,16 @@
 <!--
   =======================================================================
 
-   Innowork-Projects build file
+   Innowork-Projects-Taskboard build file
 
-   Copyright (c) 2008-2014 Innoteam Srl. All rights reserved.
+   Copyright (c) 2014 Innoteam Srl. All rights reserved.
 
   =======================================================================
 -->
-<project name="Innowork Projects" default="package">
+<project name="Innowork Projects Taskboard" default="package">
 
-	<property name="name" value="innowork-projects" />
-	<property name="version" value="1.4.0" />
+	<property name="name" value="innowork-taskboard" />
+	<property name="version" value="1.0.0" />
 
 	<target name="sources">
 		<tar destfile="${basedir}/build/${name}-src-${version}.tgz" compression="gzip">
