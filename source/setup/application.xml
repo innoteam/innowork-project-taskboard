@@ -15,7 +15,9 @@
             <dependency>innomatic[6.4.0]</dependency>
 			<dependency>innowork-core[3.4.0]</dependency>
             <dependency>innowork-projects[1.4.0]</dependency>
+            <dependency>innowork-userstories</dependency>
 			<suggestion>innowork-bugs</suggestion>
+			<suggestion>innowork-tickets</suggestion>
 		</dependencies>
 		<options>
 			<!-- <option></option> -->

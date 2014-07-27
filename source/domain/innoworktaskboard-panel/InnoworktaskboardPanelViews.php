@@ -29,7 +29,7 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
     public function beginHelper()
     {
         $this->localeCatalog = new LocaleCatalog(
-            'innowork-projects::tasks_domain_main',
+            'innowork-projects-taskboard::taskboard_panel',
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getLanguage()
         );
 
@@ -38,10 +38,10 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
         );
 
-$this->pageTitle = $this->localeCatalog->getStr('tasks.title');
+$this->pageTitle = $this->localeCatalog->getStr('taskboard.title');
 $this->toolbars['mail'] = array(
     'tasks' => array(
-        'label' => $this->localeCatalog->getStr('tasks.toolbar'),
+        'label' => $this->localeCatalog->getStr('taskboards.toolbar'),
         'themeimage' => 'listbulletleft',
         'horiz' => 'true',
         'action' => \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString('', array(array(
@@ -50,7 +50,7 @@ $this->toolbars['mail'] = array(
             array('done' => 'false'))))
        ),
     'donetasks' => array(
-        'label' => $this->localeCatalog->getStr('donetasks.toolbar'),
+        'label' => $this->localeCatalog->getStr('donetaskboards.toolbar'),
         'themeimage' => 'drawer',
         'horiz' => 'true',
         'action' => \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString('', array(array(
@@ -59,12 +59,12 @@ $this->toolbars['mail'] = array(
             array('done' => 'true'))))
        ),
     'newtask' => array(
-        'label' => $this->localeCatalog->getStr('newtask.toolbar'),
+        'label' => $this->localeCatalog->getStr('newtaskboard.toolbar'),
         'themeimage' => 'mathadd',
         'horiz' => 'true',
         'action' => \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString('', array(array(
             'view',
-            'newtask',
+            'newtaskboard',
             '')))
        )
    );
@@ -73,29 +73,36 @@ $this->toolbars['mail'] = array(
     public function endHelper()
     {
         $this->_wuiContainer->addChild(new WuiInnomaticPage('page', array(
-    'pagetitle' => $this->pageTitle,
-    'icon' => 'folder',
-    'toolbars' => array(
-        new WuiInnomaticToolbar(
-            'view',
-            array(
-                'toolbars' => $this->toolbars, 'toolbar' => 'true'
-               )),
-        new WuiInnomaticToolBar(
-            'core',
-            array(
-                'toolbars' => $this->innoworkCore->getMainToolBar(), 'toolbar' => 'true'
-               ))
-           ),
-    'maincontent' => new WuiXml(
-        'page', array(
-            'definition' => $this->xml
-           )),
-    'status' => $this->pageStatus
-   )));
+            'pagetitle' => $this->pageTitle,
+            'icon' => 'card2',
+            'toolbars' => array(
+                new WuiInnomaticToolbar(
+                    'view',
+                    array(
+                        'toolbars' => $this->toolbars, 'toolbar' => 'true'
+                       )),
+                new WuiInnomaticToolBar(
+                    'core',
+                    array(
+                        'toolbars' => $this->innoworkCore->getMainToolBar(), 'toolbar' => 'true'
+                       ))
+                   ),
+            'maincontent' => new WuiXml(
+                'page', array(
+                    'definition' => $this->xml
+                   )),
+            'status' => $this->pageStatus
+           )));
     }
 
     public function viewDefault($eventData)
+    {
+        $this->xml = '<vertgroup><children>
+            <divframe><args><id>taskboard_widget</id></args><children><taskboard><args></args></taskboard></children></divframe>
+            </children></vertgroup>';
+    }
+
+    public function viewDefaultOld($eventData)
     {
         $innowork_projects = new InnoworkProject(
                 \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
@@ -895,7 +902,7 @@ $this->toolbars['mail'] = array(
 </vertgroup>';
     }
 
-    public function viewNewtask(
+    public function viewNewtaskboard(
             $eventData
     )
     {
@@ -1455,7 +1462,7 @@ $this->toolbars['mail'] = array(
 
   <innoworkitemacl><name>itemacl</name>
     <args>
-      <itemtype>task</itemtype>
+      <itemtype>taskboard</itemtype>
       <itemid>'.$eventData['id'].'</itemid>
       <itemownerid>'.$task_data['ownerid'].'</itemownerid>
       <defaultaction>'.WuiXml::cdata(\Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString('', array(
@@ -1465,239 +1472,6 @@ $this->toolbars['mail'] = array(
 
   </children>
 </horizgroup>';
-    }
-
-    public function viewTaskmessages(
-            $eventData
-    )
-    {
-        $innowork_task = new InnoworkTask(
-                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
-                $eventData['taskid']
-        );
-
-        $messages = $innowork_task->getMessages();
-
-        $headers[0]['label'] = $this->localeCatalog->getStr('date.header');
-        $headers[1]['label'] = $this->localeCatalog->getStr('message.header');
-
-        $this->xml =
-        '
-<page>
-  <args>
-    <border>false</border>
-  </args>
-  <children>
-<table><name>taskmessages</name>
-  <args>
-    <headers type="array">'.WuiXml::encode($headers).'</headers>
-  </args>
-  <children>';
-
-        $row = 0;
-
-        $country = new \Innomatic\Locale\LocaleCountry(
-                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getCountry()
-        );
-
-        foreach ($messages as $message) {
-            $this->xml .=
-            '<vertgroup row="'.$row.'" col="0" halign="" valign="top">
-  <args>
-  </args>
-  <children>
-    <label>
-      <args>
-        <label>'.WuiXml::cdata(
-                    $country->FormatShortArrayDate($message['creationdate'])
-            ).'</label>
-        <compact>true</compact>
-      </args>
-    </label>
-    <label>
-      <args>
-        <label>'.WuiXml::cdata(
-                    $country->FormatArrayTime($message['creationdate'])
-            ).'</label>
-        <compact>true</compact>
-      </args>
-    </label>
-    <label>
-      <args>
-        <label>'.WuiXml::cdata('('.$message['username'].')').'</label>
-        <compact>true</compact>
-      </args>
-    </label>
-  </children>
-</vertgroup>
-<vertgroup row="'.$row.'" col="1" halign="" valign="top">
-  <children>
-<label>
-  <args>
-    <label>'.WuiXml::cdata(nl2br($message['content'])).'</label>
-    <nowrap>false</nowrap>
-  </args>
-</label>
-
-  <button>
-    <args>
-      <horiz>true</horiz>
-      <frame>false</frame>
-      <themeimage>buttoncancel</themeimage>
-      <themeimagetype>mini</themeimagetype>
-      <label>'.$this->localeCatalog->getStr('remove_message.button').'</label>
-      <needconfirm>true</needconfirm>
-      <confirmmessage>'.$this->localeCatalog->getStr('remove_message.confirm').'</confirmmessage>
-      <action>'.WuiXml::cdata(
-                  \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString(
-                          '',
-                          array(
-                                  array(
-                                          'view',
-                                          'taskmessages',
-                                          array(
-                                                  'taskid' => $eventData['taskid']
-                                          )
-                                  ),
-                                  array(
-                                          'action',
-                                          'removemessage',
-                                          array(
-                                                  'taskid' => $eventData['id'],
-                                                  'messageid' => $message['id']
-                                          )
-                                  )
-                          )
-                  )
-          ).'</action>
-    </args>
-  </button>
-
-  </children>
-</vertgroup>';
-            $row++;
-        }
-
-        $this->xml .=
-        '  </children>
-</table>
-  </children>
-</page>';
-
-        $wui = new WuiXml('', array('definition' => $this->xml));
-        $wui->Build(new WuiDispatcher('wui'));
-        echo $wui->render();
-
-        \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->halt();
-    }
-
-    public function viewAddmessage($eventData)
-    {
-        $innowork_task = new InnoworkTask(
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
-            $eventData['taskid']
-        );
-
-        $headers[0]['label'] = $this->localeCatalog->getStr('message.header');
-
-        $this->xml =
-        '
-<page>
-  <args>
-    <border>false</border>
-  </args>
-  <children>
-<table><name>message</name>
-  <args>
-    <headers type="array">'.WuiXml::encode($headers).'</headers>
-  </args>
-  <children>
-    <form row="0" col="0"><name>message</name>
-      <args>
-                <action>'.WuiXml::cdata(
-                            \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString(
-                                    '',
-                                    array(
-                                            array(
-                                                    'view',
-                                                    'taskmessages',
-                                                    array(
-                                                            'taskid' => $eventData['taskid']
-                                                    )
-                                            ),
-                                            array(
-                                                    'action',
-                                                    'newmessage',
-                                                    array(
-                                                            'taskid' => $eventData['taskid']
-                                                    )
-                                            )
-                                    )
-                            )
-                    ).'</action>
-      </args>
-      <children>
-
-        <text><name>content</name>
-          <args>
-            <disp>action</disp>
-            <rows>5</rows>
-            <cols>55</cols>
-          </args>
-        </text>
-
-      </children>
-    </form>
-
-        <horizgroup row="1" col="0">
-          <children>
-
-            <button>
-              <args>
-                <themeimage>buttonok</themeimage>
-                <label>'.$this->localeCatalog->getStr('add_message.button').'</label>
-                <formsubmit>message</formsubmit>
-                <frame>false</frame>
-                <horiz>true</horiz>
-                <action>'.WuiXml::cdata(
-                            \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString(
-                                    '',
-                                    array(
-                                            array(
-                                                    'view',
-                                                    'taskmessages',
-                                                    array(
-                                                            'taskid' => $eventData['taskid']
-                                                    )
-                                            ),
-                                            array(
-                                                    'action',
-                                                    'newmessage',
-                                                    array(
-                                                            'taskid' => $eventData['taskid']
-                                                    )
-                                            )
-                                    )
-                            )
-                    ).'</action>
-              </args>
-            </button>
-
-          </children>
-        </horizgroup>
-
-  </children>
-</table>
-  </children>
-</page>';
-
-        $wui = new WuiXml('', array('definition' => $this->xml));
-        $wui->Build(new WuiDispatcher('wui'));
-        echo $wui->render();
-
-        \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->halt();
     }
 
     public function viewSearchproject($eventData)
