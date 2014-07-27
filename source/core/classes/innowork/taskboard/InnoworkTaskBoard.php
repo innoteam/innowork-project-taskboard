@@ -142,6 +142,80 @@ class InnoworkTaskBoard extends InnoworkItem
         return $result;
     }
 
+    public function getCurrentIterationId()
+    {
+        $iterationQuery = $this->mrDomainDA->execute(
+            'SELECT id
+            FROM innowork_iterations
+            WHERE taskboardid='.$this->mItemId.'
+            AND done='.$this->mrDomainDA->formatText($this->mrDomainDA->fmtfalse));
+
+        if ($iterationQuery->getNumberRows() == 0) {
+            $iterationId = $this->mrDomainDA->getNextSequenceValue('innowork_iterations_id_seq');
+            $this->mrDomainDA->execute(
+                'INSERT INTO innowork_iterations
+                (id, done, startdate, enddate, taskboardid)
+                VALUES ('.
+                $iterationId.','.
+                $this->mrDomainDA->formatText($this->mrDomainDA->fmtfalse).','.
+                $this->mrDomainDA->formatText('').','.
+                $this->mrDomainDA->formatText('').','.
+                $this->mItemId.
+                ')');
+
+            return $iterationId;
+        } else {
+            return $iterationQuery->getFields('id');
+        }
+    }
+
+    public function addTaskToCurrentIteration($taskType, $taskId)
+    {
+        $iterationId = $this->getCurrentIterationId();
+
+        $innoworkCore = InnoworkCore::instance('innoworkcore',
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+        );
+        $summaries = $innoworkCore->getSummaries();
+
+        $taskClassName = $summaries[$taskType]['classname'];
+        if (!strlen($taskClassName)) {
+            return false;
+        }
+
+        $tempObject = new $taskClassName(
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
+            $taskId
+        );
+
+        $tempObject->edit(array('iterationid' => $iterationId));
+    }
+
+    public function removeTaskFromCurrentIteration($taskType, $taskId)
+    {
+        $innoworkCore = InnoworkCore::instance('innoworkcore',
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+        );
+        $summaries = $innoworkCore->getSummaries();
+
+        $taskClassName = $summaries[$taskType]['classname'];
+        if (!strlen($taskClassName)) {
+            return false;
+        }
+
+        $tempObject = new $taskClassName(
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
+            $taskId
+        );
+
+        $tempObject->edit(array('iterationid' => 0));
+
+    }
+
     public function doGetSummary()
     {
         $result = false;

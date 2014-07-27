@@ -6,6 +6,7 @@
         <field  name="done" type="boolean"/>
         <field  name="startdate" type="timestamp"/>
         <field  name="enddate" type="timestamp"/>
+        <field name="taskboardid" type="integer"/>
         <key    field="id"  type="unique"/>
     </table>
 

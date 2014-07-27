@@ -15,13 +15,16 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
     protected function generateSource()
     {
         $projectIdList = array('249');
+        $taskboardId = $this->mArgs['taskboardid'];
 
         $innoworkCore = InnoworkCore::instance('innoworkcore',
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
         );
+
         $userStoriesSummaries = $innoworkCore->getSummaries('', false, array('userstory'));
         $technicalTasksSummaries = $innoworkCore->getSummaries('', false, array('technicaltask'));
+
         $userStoriesList = array();
         $taskList = array();
         $userStoriesTasksList = array();
@@ -64,8 +67,14 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         }
 
         $backlogUserStories = array();
+        $iterationUserStories = array();
+
         foreach ($userStoriesList as $id => $values) {
-            $backlogUserStories[$id] = $values;
+            if (!(strlen($values['iterationid']) > 0 && $values['iterationid'] != 0)) {
+                $backlogUserStories[$id] = $values;
+            } else {
+                $iterationUserStories[$id] = $values;
+            }
         }
 
         /*
@@ -199,19 +208,29 @@ foreach ($backlogUserStories as $id => $item) {
 }
   $this->mLayout .= '
 </div>
-
+<!--
 <p>Support Queue</p>
 <div id="queue" style="width: 200px;">
   <div class="card" draggable="true"><header>A</header></div>
   <div class="card" draggable="true"><header>B</header></div>
   <div class="card" draggable="true"><header>C</header></div>
 </div>
+-->
 </div>
 </td><td id="taskboard" class="taskboard">
     <p>Current Iteration</p>
     <div id="taskboardDiv">
     <table id="taskboardtable" style="width: 100%; vertical-align: top;" border="1">
-        <tr><td>Story</td><td>To Do</td><td>In Progress</td><td>Done</td></tr>
+        <tr><td>Story</td><td>To Do</td><td>In Progress</td><td>Done</td></tr>';
+
+$storyCounter = 0;
+foreach ($iterationUserStories as $userStory) {
+    $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
+    $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell"><div id="card'.$storyCounter.'" class="card story"><header>'.$userStory['title'].'</header></div></td>';
+    $this->mLayout .= "</tr>\n";
+    $storyCounter++;
+}
+$this->mLayout .= '
         <tr id="taskboard-row1">
             <td id="div-row1-1" class="cell"><div id="card1" class="card story"><header>1</header></div></td>
             <td id="div-row1-2" class="cell task"><div id="card2" class="card task" draggable="true"><header>2</header></div><div id="card3" class="card task" draggable="true"><header>3</header></div></td>
@@ -275,7 +294,7 @@ function handleToTaskboardDragLeave(e) {
 
 function handleToTaskboardDrop(ev) {
     ev.preventDefault();
-    xajax_WuiTaskboardAddToTaskboard(dragSrcEl.id);
+    xajax_WuiTaskboardAddToTaskboard(".$taskboardId.", dragSrcEl.id);
 //        var data = ev.dataTransfer.getData('Text');
 //        this.appendChild(document.getElementById(data));
 }
@@ -406,94 +425,23 @@ var taskboardCards = document.querySelectorAll('#taskboard .card.task');
     }
 
 
-    public static function ajaxAddToTaskboard($card)
+    public static function ajaxAddToTaskboard($taskBoardId, $card)
     {
         $objResponse = new XajaxResponse();
 
-        $xml = '<taskboard />';
-        $html = WuiXml::getContentFromXml('', $xml);
-        $objResponse->addAssign('taskboard_widget', "innerHTML", $html);
-
-        return $objResponse;
-    }
-
-    /**
-     * Remove image selected
-     * @param  string  $containerDropzoneId id of div container of the dropzone
-     * @param  string  $page                name of page
-     * @param  integer $pageId              id of page
-     * @param  string  $block               name of block
-     * @param  integer $blockCounter        if of block
-     * @param  string  $fileId              type of media
-     * @param  integer $maxFiles            number max of image for gallery
-     * @param  integer $mediaId             id of media
-     * @param  string  $mediaName           name of media
-     * @return object                       return a object
-     */
-    public static function ajaxRemoveMedia($containerDropzoneId, $page, $pageId, $block, $blockCounter, $fileId, $maxFiles, $mediaId, $mediaName)
-    {
-
-        // Delete image from Innomedia_media
-        $image = new \Innomedia\Media($mediaId);
-        $image->retrieve();
-        $image->delete();
-
-        // Delete ref image from innomedia_blocks
-        $domainDa = InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')
-            ->getCurrentDomain()
-            ->getDataAccess();
-
-        $checkQuery = $domainDa->execute(
-            "SELECT     id, params
-                FROM    innomedia_blocks
-                WHERE   block = '$block'
-                    AND counter = $blockCounter
-                    AND page = '$page'
-                    AND pageid ".($pageId != 0 ? "= {$pageId}" : "is NULL")
+        require_once('innowork/taskboard/InnoworkTaskBoard.php');
+        $taskboard = new InnoworkTaskBoard(
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
+            $taskBoardId
         );
 
-        if ($checkQuery->getNumberRows() > 0) {
-            $row_id = $checkQuery->getFields('id');
-            $json_params = $checkQuery->getFields('params');
+        list($taskType, $taskId) = explode('-', $card);
+        $taskboard->addTaskToCurrentIteration($taskType, $taskId);
 
-            $params = json_decode($json_params, true);
-
-            $key = @array_search($mediaId, $params[$fileId.'_id']);
-
-            // remove id image selected
-            unset($params[$fileId.'_id'][$key]);
-
-            // convet array in a not-associative array
-            $params[$fileId.'_id'] = @array_values($params[$fileId.'_id']);
-
-            $domainDa->execute(
-                "UPDATE innomedia_blocks
-                SET params=".$domainDa->formatText(json_encode($params)).
-                " WHERE id=$row_id"
-            );
-
-        }
-
-        // Update widget Dropzone
-        $objResponse = new XajaxResponse();
-
-        list($pageModule, $pageName) = explode("/", $page);
-        list($blockModule, $blockName) = explode("/", $block);
-
-        $xml = '<dropzone><args>
-                  <maxfiles>'.$maxFiles.'</maxfiles>
-                  <pagemodule>'.$pageModule.'</pagemodule>
-                  <pagename>'.$pageName.'</pagename>
-                  <pageid>'.$pageId.'</pageid>
-                  <blockmodule>'.$blockModule.'</blockmodule>
-                  <blockname>'.$blockName.'</blockname>
-                  <blockcounter>'.$blockCounter.'</blockcounter>
-                  <fileid>'.$fileId.'</fileid>
-                </args></dropzone>';
-
+        $xml = '<taskboard><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
         $html = WuiXml::getContentFromXml('', $xml);
-
-        $objResponse->addAssign($containerDropzoneId, "innerHTML", $html);
+        $objResponse->addAssign('taskboard_widget', 'innerHTML', $html);
 
         return $objResponse;
     }

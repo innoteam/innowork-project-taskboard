@@ -28,4 +28,24 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
     public function endHelper()
     {
     }
+
+    public function executeNewtaskboard($eventData)
+    {
+    	require_once('innowork/taskboard/InnoworkTaskBoard.php');
+    	$board = new InnoworkTaskBoard(
+    		\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+    		\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+    	);
+
+    	if ($board->create($eventData)) {
+    		$GLOBALS['innowork-projects-taskboard']['newboardid'] = $board->mItemId;
+    		//$this->status = $this->localeCatalog->getStr('bug_created.status');
+    	} else {
+    		//$this->status = $this->localeCatalog->getStr('bug_not_created.status');
+    	}
+
+    	$this->setChanged();
+    	$this->notifyObservers('status');
+    }
+
 }
