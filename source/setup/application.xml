@@ -44,6 +44,8 @@
 
         <catalog name="innowork-projects-taskboard" />
 
+        <class name="innowork/taskboard/InnoworkTaskBoard.php" />
+
         <domainpanel name="innoworktaskboard"
             category="projects" themeicon="kword" themeicontype="apps"
             catalog="innowork-projects-taskboard::misc" />
