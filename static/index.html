@@ -1,0 +1,129 @@
+<html>
+<head>
+</head>
+<body>
+
+<style type="text/css">
+/* Prevent the text contents of draggable elements from being selectable. */
+[draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+  -khtml-user-drag: element;
+  -webkit-user-drag: element;
+}
+.column {
+  height: 50px;
+  width: 250px;
+  float: left;
+  border: 1px solid #666666;
+  background-color: #ddd;
+  margin: 3px;
+  -webkit-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  text-align: center;
+  cursor: move;
+}
+.column header {
+  color: #fff;
+  padding: 5px;
+  background-color: #cecece;
+  border-bottom: 1px solid #ddd;
+  -webkit-border-top-left-radius: 4px;
+  -moz-border-radius-topleft: 4px;
+  -ms-border-radius-topleft: 4px;
+  border-top-left-radius: 4px;
+  -webkit-border-top-right-radius: 4px;
+  -ms-border-top-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  border-top-right-radius: 4px;
+}
+
+.column.over {
+  border: 1px dashed #000;
+}
+</style>
+
+<div id="columns" style="width: 180px;">
+  <div class="column" draggable="true"><header>A</header></div>
+  <div class="column" draggable="true"><header>B</header></div>
+  <div class="column" draggable="true"><header>C</header></div>
+</div>
+
+<script>
+(function() {
+var dragSrcEl = null;
+
+function handleDragStart(e) {
+  this.style.opacity = '0.4';  // this / e.target is the source node.
+  dragSrcEl = this;
+
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/html', this.innerHTML);
+}
+
+function handleDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault(); // Necessary. Allows us to drop.
+  }
+
+  e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+
+  return false;
+}
+
+function handleDragEnter(e) {
+  // this / e.target is the current hover target.
+  this.classList.add('over');
+}
+
+function handleDragLeave(e) {
+  this.classList.remove('over');  // this / e.target is previous target element.
+}
+
+function handleDrop(e) {
+  // this / e.target is current target element.
+
+  if (e.stopPropagation) {
+    e.stopPropagation(); // stops the browser from redirecting.
+  }
+
+  // Don't do anything if dropping the same column we're dragging.
+  if (dragSrcEl != this) {
+    // Set the source column's HTML to the HTML of the column we dropped on.
+    dragSrcEl.innerHTML = this.innerHTML;
+    this.innerHTML = e.dataTransfer.getData('text/html');
+  }
+
+  return false;
+}
+
+function handleDragEnd(e) {
+  // this/e.target is the source node.
+  this.style.opacity = '1';
+
+  [].forEach.call(cols, function (col) {
+    col.classList.remove('over');
+  });
+}
+
+var cols = document.querySelectorAll('#columns .column');
+[].forEach.call(cols, function(col) {
+  col.setAttribute('draggable', 'true');  // Enable columns to be draggable.
+  col.addEventListener('dragstart', handleDragStart, false);
+  col.addEventListener('dragenter', handleDragEnter, false);
+  col.addEventListener('dragover', handleDragOver, false);
+  col.addEventListener('dragleave', handleDragLeave, false);
+  col.addEventListener('drop', handleDrop, false);
+  col.addEventListener('dragend', handleDragEnd, false);
+});
+})();
+</script>
+
+
+</body>
+</html>
