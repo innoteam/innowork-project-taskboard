@@ -14,10 +14,9 @@
   -khtml-user-drag: element;
   -webkit-user-drag: element;
 }
-.column {
+#backlog .card {
   height: 50px;
-  width: 250px;
-  float: left;
+  width: 200px;
   border: 1px solid #666666;
   background-color: #ddd;
   margin: 3px;
@@ -28,7 +27,7 @@
   text-align: center;
   cursor: move;
 }
-.column header {
+#backlog .card header {
   color: #fff;
   padding: 5px;
   background-color: #cecece;
@@ -43,30 +42,146 @@
   border-top-right-radius: 4px;
 }
 
-.column.over {
+#backlog .card.over {
   border: 1px dashed #000;
 }
+
+#taskboard .card {
+  border: 1px solid #666666;
+  margin: 3px;
+  -webkit-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#taskboard .card.task {
+  cursor: move;
+  height: 120px;
+  width: 150px;
+  background-color: #ddd;
+  color: #fff;
+}
+
+#taskboard .card.story {
+  height: 150px;
+  width: 170px;
+    background-color: yellow;
+    color: black;
+}
+
+#taskboard .card header {
+  padding: 5px;
+  /*
+  background-color: #cecece;
+  border-bottom: 1px solid #ddd;
+  */
+  -webkit-border-top-left-radius: 4px;
+  -moz-border-radius-topleft: 4px;
+  -ms-border-radius-topleft: 4px;
+  border-top-left-radius: 4px;
+  -webkit-border-top-right-radius: 4px;
+  -ms-border-top-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  border-top-right-radius: 4px;
+}
+
+#taskboard .cell.over {
+    border: 1px dashed #000;
+    background-color: #f1f1f1;
+}
+
+#taskboard .cell {
+    vertical-align: top;
+    text-align: center;
+    width: 25%;margin:10px;padding:10px;border:1px solid #aaaaaa;
+}
+
+#taskboardtable {
+    /*border: 2px solid #fff;*/
+    background-color: white;
+}
+
+.taskboardtarget {
+    border: 1px dashed #000;
+    background-color: black;
+}
+
+.taskboardover {
+  border: 1px dashed green;
+}
+
 </style>
 
-<div id="columns" style="width: 180px;">
-  <div class="column" draggable="true"><header>A</header></div>
-  <div class="column" draggable="true"><header>B</header></div>
-  <div class="column" draggable="true"><header>C</header></div>
+<table style="width: 100%; padding: 5px;">
+    <tr>
+        <td style="width: 200px; vertical-align: top;">
+            <p>Product Backlog</p>
+            <div id="backlog">
+<div id="backlog" style="width: 200px;">
+  <div class="card" draggable="true"><header>A</header></div>
+  <div class="card" draggable="true"><header>B</header></div>
+  <div class="card" draggable="true"><header>C</header></div>
 </div>
+
+<p>Support Queue</p>
+<div id="queue" style="width: 200px;">
+  <div class="card" draggable="true"><header>A</header></div>
+  <div class="card" draggable="true"><header>B</header></div>
+  <div class="card" draggable="true"><header>C</header></div>
+</div>
+</div>
+</td><td id="taskboard" class="taskboard">
+    <p>Current Iteration</p>
+    <div id="taskboardDiv">
+    <table id="taskboardtable" style="width: 100%; vertical-align: top;" border="1">
+        <tr><td>Story</td><td>To Do</td><td>In Progress</td><td>Done</td></tr>
+        <tr id="taskboard-row1">
+            <td id="div-row1-1" class="cell"><div id="card1" class="card story"><header>1</header></div></td>
+            <td id="div-row1-2" class="cell task"><div id="card2" class="card task" draggable="true"><header>2</header></div><div id="card3" class="card task" draggable="true"><header>3</header></div></td>
+            <td id="div-row1-3" class="cell task"><div id="card4" class="card task" draggable="true"><header>4</header></div></td>
+            <td id="div-row1-4" class="cell task"><div id="card5" class="card task" draggable="true"><header>5</header></div></td>
+        </tr>
+        <tr id="taskboard-row2">
+            <td id="div-row2-1" class="cell"><div id="card6" class="card story"><header>6</header></div></td>
+            <td id="div-row2-2" class="cell task"><div id="card7" class="card task" draggable="true"><header>7</header></div><div id="card8" class="card task" draggable="true"><header>8</header></div></td>
+            <td id="div-row2-3" class="cell task"><div id="card9" class="card task" draggable="true"><header>9</header></div><div id="card10" class="card task" draggable="true"><header>10</header></div></td>
+            <td id="div-row2-4" class="cell task"></td>
+        </tr>
+    </table>
+    </div>
+</td><td style="width: 200px; vertical-align: top;">
+    <p>Increments</p>
+        </td>
+    </tr>
+    </table>
 
 <script>
 (function() {
 var dragSrcEl = null;
 
-function handleDragStart(e) {
+function handleBacklogDragStart(e) {
   this.style.opacity = '0.4';  // this / e.target is the source node.
   dragSrcEl = this;
 
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('text/html', this.innerHTML);
+
+  taskboard = document.getElementById('taskboardtable');
+  taskboard.addEventListener('drop', handleToTaskboardDrop, false);
+  taskboard.addEventListener('dragover', handleToTaskboardDragOver, false);
+  taskboard.addEventListener('dragenter', handleToTaskboardDragEnter, false);
+  taskboard.addEventListener('dragleave', handleToTaskboardDragLeave, false);
+  //taskboard.style.background = '#f1f1f1';
+  taskboard.classList.add('taskboardtarget');
 }
 
-function handleDragOver(e) {
+function handleToTaskboardDragOver(e) {
+    this.classList.remove('taskboardtarget');
+    this.classList.add('taskboardover');
   if (e.preventDefault) {
     e.preventDefault(); // Necessary. Allows us to drop.
   }
@@ -76,25 +191,50 @@ function handleDragOver(e) {
   return false;
 }
 
-function handleDragEnter(e) {
+function handleToTaskboardDragEnter(e) {
+}
+
+function handleToTaskboardDragLeave(e) {
+    this.classList.remove('taskboardover');
+    this.classList.add('taskboardtarget');
+}
+
+function handleToTaskboardDrop(ev) {
+    ev.preventDefault();
+//        var data = ev.dataTransfer.getData("Text");
+//        this.appendChild(document.getElementById(data));
+}
+
+function handleBacklogDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault(); // Necessary. Allows us to drop.
+  }
+
+  e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+
+  return false;
+}
+
+function handleBacklogDragEnter(e) {
   // this / e.target is the current hover target.
-  this.classList.add('over');
+    if (this.parentNode.id == dragSrcEl.parentNode.id) {
+        this.classList.add('over');
+    }
 }
 
-function handleDragLeave(e) {
-  this.classList.remove('over');  // this / e.target is previous target element.
+function handleBacklogDragLeave(e) {
+    this.classList.remove('over');  // this / e.target is previous target element.
 }
 
-function handleDrop(e) {
+function handleBacklogDrop(e) {
   // this / e.target is current target element.
 
   if (e.stopPropagation) {
     e.stopPropagation(); // stops the browser from redirecting.
   }
-
-  // Don't do anything if dropping the same column we're dragging.
-  if (dragSrcEl != this) {
-    // Set the source column's HTML to the HTML of the column we dropped on.
+  // Don't do anything if dropping the same card we're dragging.
+  if (dragSrcEl != this && this.parentNode.id == dragSrcEl.parentNode.id) {
+    // Set the source card's HTML to the HTML of the card we dropped on.
     dragSrcEl.innerHTML = this.innerHTML;
     this.innerHTML = e.dataTransfer.getData('text/html');
   }
@@ -102,25 +242,85 @@ function handleDrop(e) {
   return false;
 }
 
-function handleDragEnd(e) {
+function handleBacklogDragEnd(e) {
   // this/e.target is the source node.
   this.style.opacity = '1';
 
-  [].forEach.call(cols, function (col) {
+  taskboard = document.getElementById('taskboardtable');
+  taskboard.classList.remove('taskboardtarget');
+    taskboard.classList.remove('taskboardover');
+  taskboard.removeEventListener('drop', handleToTaskboardDrop, false);
+  taskboard.removeEventListener('dragover', handleToTaskboardDragOver, false);
+  taskboard.removeEventListener('dragenter', handleToTaskboardDragEnter, false);
+  taskboard.removeEventListener('dragleave', handleToTaskboardDragLeave, false);
+
+  [].forEach.call(backlogCards, function (col) {
     col.classList.remove('over');
   });
 }
 
-var cols = document.querySelectorAll('#columns .column');
-[].forEach.call(cols, function(col) {
-  col.setAttribute('draggable', 'true');  // Enable columns to be draggable.
-  col.addEventListener('dragstart', handleDragStart, false);
-  col.addEventListener('dragenter', handleDragEnter, false);
-  col.addEventListener('dragover', handleDragOver, false);
-  col.addEventListener('dragleave', handleDragLeave, false);
-  col.addEventListener('drop', handleDrop, false);
-  col.addEventListener('dragend', handleDragEnd, false);
+function handleTaskboardDragOver(ev) {
+    ev.preventDefault();
+}
+
+function handleTaskboardDragLeave(e) {
+    this.classList.remove('over');  // this / e.target is previous target element.
+}
+
+function handleTaskboardDragStart(e) {
+  dragSrcEl = this;
+    e.dataTransfer.setData("Text", e.target.id);
+}
+
+function handleTaskboardDrop(ev) {
+    ev.preventDefault();
+    if (dragSrcEl != this && this.parentNode.id == dragSrcEl.parentNode.parentNode.id) {
+        var data = ev.dataTransfer.getData("Text");
+        this.appendChild(document.getElementById(data));
+    }
+}
+
+function handleTaskboardDragEnter(e) {
+  // this / e.target is the current hover target.
+    if (this.parentNode.id == dragSrcEl.parentNode.parentNode.id) {
+        this.classList.add('over');
+    }
+}
+
+function handleTaskboardDragEnd(e) {
+  // this/e.target is the source node.
+  this.style.opacity = '1';
+  [].forEach.call(taskboardCells, function (col) {
+    col.classList.remove('over');
+  });
+}
+
+var backlogCards = document.querySelectorAll('#backlog .card');
+[].forEach.call(backlogCards, function(col) {
+  col.setAttribute('draggable', 'true');  // Enable backlog cards to be draggable.
+  col.addEventListener('dragstart', handleBacklogDragStart, false);
+  col.addEventListener('dragenter', handleBacklogDragEnter, false);
+  col.addEventListener('dragover', handleBacklogDragOver, false);
+  col.addEventListener('dragleave', handleBacklogDragLeave, false);
+  col.addEventListener('drop', handleBacklogDrop, false);
+  col.addEventListener('dragend', handleBacklogDragEnd, false);
 });
+
+var taskboardCells = document.querySelectorAll('#taskboard .cell.task');
+[].forEach.call(taskboardCells, function(col) {
+  col.addEventListener('drop', handleTaskboardDrop, false);
+  col.addEventListener('dragover', handleTaskboardDragOver, false);
+  col.addEventListener('dragenter', handleTaskboardDragEnter, false);
+  col.addEventListener('dragleave', handleTaskboardDragLeave, false);
+  col.addEventListener('dragend', handleTaskboardDragEnd, false);
+});
+
+var taskboardCards = document.querySelectorAll('#taskboard .card.task');
+[].forEach.call(taskboardCards, function(col) {
+  col.setAttribute('draggable', 'true');  // Enable taskboard cards to be draggable.
+  col.addEventListener('dragstart', handleTaskboardDragStart, false);
+});
+
 })();
 </script>
 
