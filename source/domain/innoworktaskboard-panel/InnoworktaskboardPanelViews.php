@@ -129,7 +129,7 @@ $this->toolbars['taskboards'] = array(
             $projects[$id] = $fields['name'];
         }
 
-        $headers[0]['label'] = $this->localeCatalog->getStr('newtask.header');
+        $headers[0]['label'] = $this->localeCatalog->getStr('newtaskboard.header');
 
         $this->xml =
         '
@@ -166,7 +166,7 @@ $this->toolbars['taskboards'] = array(
 
                 <label row="0" col="0">
                   <args>
-                    <label>'.$this->localeCatalog->getStr('project.label').'</label>
+                    <label>'.$this->localeCatalog->getStr('taskboardname.label').'</label>
                   </args>
                 </label>
 
@@ -189,7 +189,7 @@ $this->toolbars['taskboards'] = array(
             <button>
               <args>
                 <themeimage>buttonok</themeimage>
-                <label>'.$this->localecatalog->getstr('new_task.button').'</label>
+                <label>'.$this->localeCatalog->getstr('new_taskboard.button').'</label>
                 <formsubmit>newtask</formsubmit>
                 <frame>false</frame>
                 <horiz>true</horiz>
