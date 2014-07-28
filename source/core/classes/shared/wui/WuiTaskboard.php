@@ -103,7 +103,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         <td style="width: 200px; vertical-align: top;">
 <table>
 <tr>
-<td>Product Backlog</td>
+<td>'.$localeCatalog->getStr('productbacklog.label').'</td>
 </tr>
 </table>
             <div id="backlog">
@@ -126,7 +126,7 @@ foreach ($backlogUserStories as $id => $item) {
 </td><td id="taskboard" class="taskboard" style="vertical-align: top;">
     <table style="width: 100%">
 <tr>
-<td>Current iteration</td>
+<td>'.$localeCatalog->getStr('currentiteration.label').'</td>
 <td style="align: right">';
 
 $this->mLayout .= WuiXml::getContentFromXml('', '            <button>
@@ -182,7 +182,7 @@ $this->mLayout .= '
     </table>
     </div>
 </td><td style="width: 200px; vertical-align: top;">
-    <p>Increments</p>
+    <p>'.$localeCatalog->getStr('increments.label').'</p>
         </td>
     </tr>
     </table>
