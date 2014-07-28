@@ -211,7 +211,7 @@ foreach ($backlogUserStories as $id => $item) {
         <tr><td style="text-align: center">Story</td>';
 
 foreach ($taskStatusList as $id => $status) {
-    $this->mLayout .= "<td style="text-align: center">$status</td>";
+    $this->mLayout .= "<td style=\"text-align: center\">$status</td>";
 }
 
 $this->mLayout .= '</tr>';
@@ -227,7 +227,7 @@ foreach ($iterationUserStories as $userStory) {
         $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task">';
         foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
             if ($taskValues['statusid'] == $statusId) {
-                $this->mLayout .= '<div id="card-task-'.$taskId.'" class="card task" draggable="true"><header>'.$taskValues['title'].'</header></div>';
+                $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header>'.$taskValues['title'].'</header></div>';
             }
         }
         $this->mLayout .= "</td>\n";
@@ -365,6 +365,8 @@ function handleTaskboardDrop(ev) {
     if (dragSrcEl != this && this.parentNode.id == dragSrcEl.parentNode.parentNode.id) {
         var data = ev.dataTransfer.getData('Text');
         this.appendChild(document.getElementById(data));
+        statusCell = ev.target.id.split('-');
+        xajax_WuiTaskboardUpdateTaskStatus(".$taskboardId.", dragSrcEl.id, statusCell[2]);
     }
 }
 
@@ -439,4 +441,26 @@ var taskboardCards = document.querySelectorAll('#taskboard .card.task');
 
         return $objResponse;
     }
+
+    public static function ajaxUpdateTaskStatus($taskBoardId, $card, $statusId)
+    {
+        $objResponse = new XajaxResponse();
+
+        require_once('innowork/taskboard/InnoworkTaskBoard.php');
+        $taskboard = new InnoworkTaskBoard(
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
+            $taskBoardId
+        );
+
+        list($cardName, $taskType, $taskId) = explode('-', $card);
+        $taskboard->setTaskStatus($taskType, $taskId, $statusId);
+
+        $xml = '<taskboard><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
+        $html = WuiXml::getContentFromXml('', $xml);
+        $objResponse->addAssign('taskboard_widget', 'innerHTML', $html);
+
+        return $objResponse;
+    }
+
 }

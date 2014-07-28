@@ -213,8 +213,29 @@ class InnoworkTaskBoard extends InnoworkItem
         );
 
         $tempObject->edit(array('iterationid' => 0));
-
     }
+
+    /* public setTaskStatus($taskType, $taskId, $taskStatus) {{{ */
+    /**
+     * Updates the status of the given task.
+     *
+     * @param string $taskType Task type
+     * @param integer $taskId Task id
+     * @param integer $taskStatus New status id
+     * @static
+     * @access public
+     * @return boolean
+     */
+    public static function setTaskStatus($taskType, $taskId, $taskStatus)
+    {
+        $item = InnoworkCore::getItem($taskType, $taskId);
+        if (is_object($item)) {
+            return $item->edit(array('statusid' => $taskStatus));
+        } else {
+            return false;
+        }
+    }
+    /* }}} */
 
     public function doGetSummary()
     {
