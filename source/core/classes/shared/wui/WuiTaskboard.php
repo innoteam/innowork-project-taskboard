@@ -17,6 +17,11 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         $projectIdList = array('249', '288');
         $taskboardId = $this->mArgs['taskboardid'];
 
+        $localeCatalog = new LocaleCatalog(
+            'innowork-projects-taskboard::widget',
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getLanguage()
+        );
+
         $innoworkCore = InnoworkCore::instance('innoworkcore',
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
@@ -186,7 +191,11 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         $this->mLayout .= '<table style="width: 100%; padding: 5px;">
     <tr>
         <td style="width: 200px; vertical-align: top;">
-            <p>Product Backlog</p>
+<table>
+<tr>
+<td>Product Backlog</td>
+</tr>
+</table>
             <div id="backlog">
 <div id="backlog" style="width: 200px;">';
 
@@ -204,8 +213,31 @@ foreach ($backlogUserStories as $id => $item) {
 </div>
 -->
 </div>
-</td><td id="taskboard" class="taskboard">
-    <p>Current Iteration</p>
+</td><td id="taskboard" class="taskboard" style="vertical-align: top;">
+    <table style="width: 100%">
+<tr>
+<td>Current iteration</td>
+<td style="align: right">';
+
+$this->mLayout .= WuiXml::getContentFromXml('', '            <button>
+              <args>
+                <themeimage>cycle</themeimage>
+                <label>'.$localeCatalog->getstr('refreshboard.button').'</label>
+                <frame>false</frame>
+                <horiz>true</horiz>
+                <action>javascript:void(0)</action>
+                </args>
+                  <events>
+                  <click>
+                  xajax_WuiTaskboardRefreshBoard('.$taskboardId.')</click>
+                  </events>
+            </button>
+');
+$this->mLayout .= '
+</td>
+</tr>
+</table>
+
     <div id="taskboardDiv">
     <table id="taskboardtable" style="width: 100%; vertical-align: top;" border="1">
         <tr><td style="text-align: center">Story</td>';
@@ -365,7 +397,7 @@ function handleTaskboardDrop(ev) {
     if (dragSrcEl != this && this.parentNode.id == dragSrcEl.parentNode.parentNode.id) {
         var data = ev.dataTransfer.getData('Text');
         this.appendChild(document.getElementById(data));
-        statusCell = ev.target.id.split('-');
+        statusCell = this.id.split('-');
         xajax_WuiTaskboardUpdateTaskStatus(".$taskboardId.", dragSrcEl.id, statusCell[2]);
     }
 }
@@ -463,4 +495,14 @@ var taskboardCards = document.querySelectorAll('#taskboard .card.task');
         return $objResponse;
     }
 
+    public static function ajaxRefreshBoard($taskBoardId)
+    {
+        $objResponse = new XajaxResponse();
+
+        $xml = '<taskboard><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
+        $html = WuiXml::getContentFromXml('', $xml);
+        $objResponse->addAssign('taskboard_widget', 'innerHTML', $html);
+
+        return $objResponse;
+    }
 }
