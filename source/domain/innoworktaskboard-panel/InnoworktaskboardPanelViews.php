@@ -39,7 +39,7 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
         );
 
 $this->pageTitle = $this->localeCatalog->getStr('taskboard.title');
-$this->toolbars['mail'] = array(
+$this->toolbars['taskboards'] = array(
     'tasks' => array(
         'label' => $this->localeCatalog->getStr('taskboards.toolbar'),
         'themeimage' => 'listbulletleft',
@@ -57,17 +57,20 @@ $this->toolbars['mail'] = array(
             'view',
             'default',
             array('done' => 'true'))))
-       ),
-    'newtask' => array(
-        'label' => $this->localeCatalog->getStr('newtaskboard.toolbar'),
-        'themeimage' => 'mathadd',
-        'horiz' => 'true',
-        'action' => \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString('', array(array(
-            'view',
-            'newtaskboard',
-            '')))
-       )
-   );
+        )
+    );
+
+        if (\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->hasPermission('add_taskboards')) {
+            $this->toolbars['taskboards']['newtask'] = array(
+                'label' => $this->localeCatalog->getStr('newtaskboard.toolbar'),
+                'themeimage' => 'mathadd',
+                'horiz' => 'true',
+                'action' => \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString('', array(array(
+                    'view',
+                    'newtaskboard',
+                    '')))
+               );
+        }
     }
 
     public function endHelper()
@@ -106,6 +109,10 @@ $this->toolbars['mail'] = array(
             $eventData
     )
     {
+        // Check if the user has enough permissions to create taskboards
+        if (!\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->hasPermission('add_taskboards')) {
+            return $this->viewDefault();
+        }
         // Projects
 
         require_once('innowork/projects/InnoworkProject.php');
@@ -182,12 +189,12 @@ $this->toolbars['mail'] = array(
             <button>
               <args>
                 <themeimage>buttonok</themeimage>
-                <label>'.$this->localeCatalog->getStr('new_task.button').'</label>
+                <label>'.$this->localecatalog->getstr('new_task.button').'</label>
                 <formsubmit>newtask</formsubmit>
                 <frame>false</frame>
                 <horiz>true</horiz>
-                <action>'.WuiXml::cdata(
-                            \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString(
+                <action>'.wuixml::cdata(
+                            \innomatic\wui\dispatch\wuieventscall::buildeventscallstring(
                                     '',
                                     array(
                                             array(

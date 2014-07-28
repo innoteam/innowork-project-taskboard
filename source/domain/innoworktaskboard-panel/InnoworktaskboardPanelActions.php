@@ -31,6 +31,10 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
 
     public function executeNewtaskboard($eventData)
     {
+        if (!\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->hasPermission('add_taskboards')) {
+            return;
+        }
+
     	require_once('innowork/taskboard/InnoworkTaskBoard.php');
     	$board = new InnoworkTaskBoard(
     		\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
