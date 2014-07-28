@@ -100,9 +100,63 @@ $this->toolbars['taskboards'] = array(
 
     public function viewDefault($eventData)
     {
+        $currentTaskBoard = 0;
+
+        // Build the list of the available task boards
+        $taskboard = InnoworkCore::getItem('taskboard');
+        $taskboardSearchResults = $taskboard->search(
+            array('done' => \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess()->fmtfalse),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId()
+        );
+
+        $taskboardsComboList = array();
+
+        // If there is no task board, give the no task boards found message
+        if (count($taskboardSearchResults) == 0) {
+            // @todo
+        }
+
+        // Check if the saved current board still exists/is accessible
+        if (!isset($taskboardSearchResults[$currentTaskBoard])) {
+            $currentTaskBoard = 0;
+        }
+
+        // Build the task board combo list
+        foreach ($taskboardSearchResults as $id => $taskboardValues) {
+            if ($currentTaskBoard == 0) {
+                $currentTaskBoard = $id;
+            }
+            $taskboardsComboList[$id] = $taskboardValues['title'];
+        }
+
         $this->xml = '<vertgroup><children>
-            <divframe><args><id>taskboard_widget</id></args><children><taskboard><args><taskboardid>2</taskboardid></args></taskboard></children></divframe>
-            </children></vertgroup>';
+
+            <horizgroup><args><width>0%</width></args>
+            <children>
+            <label><args><label>'.WuiXml::cdata($this->localeCatalog->getStr('taskboard_selection_label')).'</label></args></label>
+            <combobox><args><id>taskboard_selector</id><default>'.WuiXml::cdata($currentTaskBoard).'</default><elements type="array">'.WuiXml::encode($taskboardsComboList).'</elements></args>
+              <events>
+              <change>
+              var taskboard = document.getElementById(\'taskboard_selector\');
+              var taskboardvalue = taskboard.options[taskboard.selectedIndex].value;
+              var elements = taskboardvalue.split(\'/\');
+              xajax_WuiTaskboardRefreshBoard(taskboardvalue)</change>
+              </events>
+            </combobox>
+            </children>
+            </horizgroup>
+
+                <horizbar />
+
+                <divframe><args><id>taskboard_widget</id></args><children>';
+
+        if ($currentTaskBoard != 0 and strlen($currentTaskBoard)) {
+            $this->xml .= '<taskboard><args><taskboardid>'.$currentTaskBoard.'</taskboardid></args></taskboard>';
+        } else {
+            $this->xml .= '<void/>';
+        }
+
+        $this->xml .= '</children></divframe></children></vertgroup>';
     }
 
     public function viewNewtaskboard(
