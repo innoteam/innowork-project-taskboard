@@ -67,5 +67,7 @@
 			icontype="apps" domainpanel="innoworktaskboard"
 			miniicon="folder_txt" summaryname="taskboard-name" showmode="list" />
 
+        <shared name="taskboard" />
+
 	</components>
 </application>
