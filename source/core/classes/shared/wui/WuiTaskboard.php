@@ -14,7 +14,21 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 
     protected function generateSource()
     {
-        $projectIdList = array('249', '288');
+        $projectsQuery = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()->execute(
+            'SELECT projectid
+            FROM innowork_taskboards_projects
+            WHERE taskboardid = '.$this->mArgs['taskboardid']
+        );
+
+        $projectIdList = array();
+
+        if ($projectsQuery->getNumberRows() > 0) {
+            while (!$projectsQuery->eof) {
+                $projectIdList[] = $projectsQuery->getFields('projectid');
+                $projectsQuery->moveNext();
+            }
+        }
+
         $taskboardId = $this->mArgs['taskboardid'];
 
         $localeCatalog = new LocaleCatalog(

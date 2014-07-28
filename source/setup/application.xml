@@ -58,8 +58,8 @@
             file="innowork_taskboards.xml" />
         <domaintable name="innowork_iterations"
             file="innowork_iterations.xml" />
-        <domaintable name="innowork_iterations_projects"
-            file="innowork_iterations_projects.xml" />
+        <domaintable name="innowork_taskboards_projects"
+            file="innowork_taskboards_projects.xml" />
 
 		<innoworkitemtype name="taskboard" file="taskboard"
 			catalog="innowork-projects-taskboard::misc"
