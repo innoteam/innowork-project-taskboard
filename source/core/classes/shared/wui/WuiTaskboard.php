@@ -14,7 +14,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 
     protected function generateSource()
     {
-        $projectIdList = array('249');
+        $projectIdList = array('249', '288');
         $taskboardId = $this->mArgs['taskboardid'];
 
         $innoworkCore = InnoworkCore::instance('innoworkcore',
@@ -77,6 +77,11 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             }
         }
 
+        // Task statuses
+        $taskStatusList = InnoworkTaskField::getFields(InnoworkTaskField::TYPE_STATUS);
+
+        // @todo sort by order
+
         /*
         print_r($userStoriesList);
         print_r($taskList);
@@ -98,28 +103,19 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 }
 #backlog .card {
   width: 200px;
-  background-color: #ddd;
+  background-color: #3f90ea;
   margin: 3px;
-  -webkit-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
   text-align: center;
   cursor: move;
+  color: #fff;
+  font-size: 12px;
 }
 #backlog .card header {
   color: #fff;
   padding: 5px;
-  background-color: #cecece;
+  background-color: #dce6f3;
   border-bottom: 1px solid #ddd;
-  -webkit-border-top-left-radius: 4px;
-  -moz-border-radius-topleft: 4px;
-  -ms-border-radius-topleft: 4px;
-  border-top-left-radius: 4px;
-  -webkit-border-top-right-radius: 4px;
-  -ms-border-top-right-radius: 4px;
-  -moz-border-radius-topright: 4px;
-  border-top-right-radius: 4px;
+  font-size: 12px;
 }
 
 #backlog .card.over {
@@ -128,27 +124,25 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 
 #taskboard .card {
   margin: 3px;
-  -webkit-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
+  font-size: 12px;
 }
 
 #taskboard .card.task {
   cursor: move;
-  height: 120px;
-  width: 150px;
-  background-color: #ddd;
-  color: #fff;
+  height: 75px;
+  width: 120px;
+  background-color: #dce6f3;
+  color: black;
+  font-weight: 300;
 }
 
 #taskboard .card.story {
-  height: 150px;
-  width: 170px;
-    background-color: yellow;
+  height: 90px;
+  width: 140px;
+    background-color: #96b4d6;
     color: black;
 }
 
@@ -158,13 +152,6 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
   background-color: #cecece;
   border-bottom: 1px solid #ddd;
   */
-  -webkit-border-top-left-radius: 4px;
-  -moz-border-radius-topleft: 4px;
-  -ms-border-radius-topleft: 4px;
-  border-top-left-radius: 4px;
-  -webkit-border-top-right-radius: 4px;
-  -ms-border-top-right-radius: 4px;
-  -moz-border-radius-topright: 4px;
   border-top-right-radius: 4px;
 }
 
@@ -221,28 +208,35 @@ foreach ($backlogUserStories as $id => $item) {
     <p>Current Iteration</p>
     <div id="taskboardDiv">
     <table id="taskboardtable" style="width: 100%; vertical-align: top;" border="1">
-        <tr><td>Story</td><td>To Do</td><td>In Progress</td><td>Done</td></tr>';
+        <tr><td style="text-align: center">Story</td>';
+
+foreach ($taskStatusList as $id => $status) {
+    $this->mLayout .= "<td style="text-align: center">$status</td>";
+}
+
+$this->mLayout .= '</tr>';
 
 $storyCounter = 0;
 foreach ($iterationUserStories as $userStory) {
     $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
-    $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell"><div id="card'.$storyCounter.'" class="card story"><header>'.$userStory['title'].'</header></div></td>';
+    $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell"><div id="card'.$storyCounter.'" class="card story"><header>'.$userStory['title']."</header></div></td>\n";
+
+    // Draw task cards
+
+    foreach ($taskStatusList as $statusId => $statusLabel) {
+        $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task">';
+        foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
+            if ($taskValues['statusid'] == $statusId) {
+                $this->mLayout .= '<div id="card-task-'.$taskId.'" class="card task" draggable="true"><header>'.$taskValues['title'].'</header></div>';
+            }
+        }
+        $this->mLayout .= "</td>\n";
+    }
+
     $this->mLayout .= "</tr>\n";
     $storyCounter++;
 }
 $this->mLayout .= '
-        <tr id="taskboard-row1">
-            <td id="div-row1-1" class="cell"><div id="card1" class="card story"><header>1</header></div></td>
-            <td id="div-row1-2" class="cell task"><div id="card2" class="card task" draggable="true"><header>2</header></div><div id="card3" class="card task" draggable="true"><header>3</header></div></td>
-            <td id="div-row1-3" class="cell task"><div id="card4" class="card task" draggable="true"><header>4</header></div></td>
-            <td id="div-row1-4" class="cell task"><div id="card5" class="card task" draggable="true"><header>5</header></div></td>
-        </tr>
-        <tr id="taskboard-row2">
-            <td id="div-row2-1" class="cell"><div id="card6" class="card story"><header>6</header></div></td>
-            <td id="div-row2-2" class="cell task"><div id="card7" class="card task" draggable="true"><header>7</header></div><div id="card8" class="card task" draggable="true"><header>8</header></div></td>
-            <td id="div-row2-3" class="cell task"><div id="card9" class="card task" draggable="true"><header>9</header></div><div id="card10" class="card task" draggable="true"><header>10</header></div></td>
-            <td id="div-row2-4" class="cell task"></td>
-        </tr>
     </table>
     </div>
 </td><td style="width: 200px; vertical-align: top;">
