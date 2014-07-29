@@ -175,10 +175,11 @@ $this->mLayout .= '
 
     <div id="taskboardDiv">
     <table id="taskboardtable" style="width: 100%; vertical-align: top;" border="1">
-        <tr><td style="text-align: center">Story</td>';
+        <tr><td style="text-align: center; width: 0%;">Story</td>';
 
+$cellWidth = 100 / count($taskStatusList);
 foreach ($taskStatusList as $id => $status) {
-    $this->mLayout .= "<td style=\"text-align: center\">$status</td>";
+    $this->mLayout .= "<td style=\"text-align: center; width: {$cellWidth}%;\">$status</td>";
 }
 
 $this->mLayout .= '</tr>';
@@ -186,12 +187,12 @@ $this->mLayout .= '</tr>';
 $storyCounter = 0;
 foreach ($iterationUserStories as $userStory) {
     $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
-    $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell"><div id="card'.$storyCounter.'" class="card story"><header>'.$userStory['title']."</header></div></td>\n";
+    $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="width: 0%;"><div id="card'.$storyCounter.'" class="card story"><header>'.$userStory['title']."</header></div></td>\n";
 
     // Draw task cards
 
     foreach ($taskStatusList as $statusId => $statusLabel) {
-        $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task">';
+        $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task"'."style=\"width: {$cellWidth}%;\">";
         foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
             if ($taskValues['statusid'] == $statusId) {
                 $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header>'.$taskValues['title'].'</header></div>';
