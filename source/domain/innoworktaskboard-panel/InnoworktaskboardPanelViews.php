@@ -114,11 +114,12 @@ $this->toolbars['taskboards'] = array(
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId()
         );
 
+        $this->xml = '<vertgroup><children>';
+
         $taskboardsComboList = array();
 
         // If there is no task board, give the no task boards found message
         if (count($taskboardSearchResults) == 0) {
-            $taskboardsComboList[0] = 'No board available';
             // @todo
         } else {
             // Check if the saved current board still exists/is accessible
@@ -133,11 +134,8 @@ $this->toolbars['taskboards'] = array(
                 }
                 $taskboardsComboList[$id] = $taskboardValues['title'];
             }
-        }
 
-        $this->xml = '<vertgroup><children>
-
-            <horizgroup><args><width>0%</width></args>
+        $this->xml .= '    <horizgroup><args><width>0%</width></args>
             <children>
             <label><args><label>'.WuiXml::cdata($this->localeCatalog->getStr('taskboard_selection_label')).'</label></args></label>
             <combobox><args><id>taskboard_selector</id><default>'.WuiXml::cdata($currentTaskBoard).'</default><elements type="array">'.WuiXml::encode($taskboardsComboList).'</elements></args>
@@ -152,17 +150,20 @@ $this->toolbars['taskboards'] = array(
             </children>
             </horizgroup>
 
-                <horizbar />
+                <horizbar />';
 
-                <divframe><args><id>taskboard_widget</id></args><children>';
+            $this->xml .= '        <divframe><args><id>taskboard_widget</id></args><children>';
 
-        if ($currentTaskBoard != 0 and strlen($currentTaskBoard)) {
-            $this->xml .= '<taskboard><name>taskboard</name><args><taskboardid>'.$currentTaskBoard.'</taskboardid></args></taskboard>';
-        } else {
-            $this->xml .= '<void/>';
+            if ($currentTaskBoard != 0 and strlen($currentTaskBoard)) {
+                $this->xml .= '<taskboard><name>taskboard</name><args><taskboardid>'.$currentTaskBoard.'</taskboardid></args></taskboard>';
+            } else {
+                $this->xml .= '<void/>';
+            }
+
+            $this->xml .= '</children></divframe>';
         }
 
-        $this->xml .= '</children></divframe></children></vertgroup>';
+        $this->xml .= '</children></vertgroup>';
     }
 
     public function viewNewtaskboard(
