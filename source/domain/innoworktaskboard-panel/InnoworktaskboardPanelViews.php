@@ -114,7 +114,9 @@ $this->toolbars['taskboards'] = array(
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId()
         );
 
-        $this->xml = '<vertgroup><children>';
+        $this->xml = '<vertgroup><children>
+            <raw><args><content>'.WuiXml::cdata('<link rel="stylesheet" type="text/css" href="'.
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getExternalBaseUrl().'/shared/taskboard/taskboard.css">').'</content></args></raw>';
 
         $taskboardsComboList = array();
 
