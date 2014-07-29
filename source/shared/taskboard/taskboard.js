@@ -203,7 +203,6 @@ function handleUserStoryDrop(e) {
   // Don't do anything if dropping the same card we're dragging.
     //&& this.parentNode.id == dragSrcEl.parentNode.id
   if (dragSrcEl != this ) {
-alert('ok');
     // Set the source card's HTML to the HTML of the card we dropped on.
     dragSrcEl.innerHTML = this.innerHTML;
     this.innerHTML = e.dataTransfer.getData('text/html');
