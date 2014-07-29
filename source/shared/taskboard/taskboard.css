@@ -10,7 +10,7 @@
 }
 #backlog .card {
   width: 180px;
-  background-color: #3f90ea;
+  background-color: #34aadc;
   margin: 3px;
   padding: 5px;
 
@@ -44,7 +44,7 @@ float: left;
   cursor: move;
   height: 75px;
   width: 120px;
-  background-color: #dce6f3;
+  background-color: #ffcc00;
   color: black;
   font-weight: 300;
 }
@@ -52,7 +52,7 @@ float: left;
 #taskboard .card.story {
   height: 90px;
   width: 140px;
-    background-color: #96b4d6;
+    background-color: #ff2d55;
     color: black;
 }
 
