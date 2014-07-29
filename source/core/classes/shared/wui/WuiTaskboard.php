@@ -173,26 +173,44 @@ $this->mLayout .= '
 </tr>
 </table>
 
-    <div id="taskboardDiv">
-    <table id="taskboardtable" style="width: 100%; vertical-align: top;" border="1">
-        <tr><td style="text-align: center; width: 0%;">Story</td>';
+    <div id="taskboardDiv">';
+
+    //<table id="taskboardtable" style="width: 100%; vertical-align: top;" border="1">
+        //<tr><td style="text-align: center; width: 0%;">Story</td>';
 
 $cellWidth = 100 / count($taskStatusList);
+
+$this->mLayout .= '<table id="taskboardtable"' . ' border="0" cellspacing="2" cellpadding="1" width="100%" style="width: 100%; vertical-align: top; margin: 1px;"' . "><tr><td bgcolor=\"" . $this->mThemeHandler->mColorsSet['tables']['gridcolor'] . "\">\n";
+$this->mLayout .= '<table border="0" width="100%" cellspacing="1" cellpadding="3" bgcolor="' . $this->mThemeHandler->mColorsSet['tables']['bgcolor'] . "\">\n";
+$this->mLayout .= "<tr>\n";
+
+// Task Board column headers
+
+$this->mLayout .= '<td valign="top" width="0%"><table cellpadding="4" cellspacing="1" width="100%"><tr>';
+$this->mLayout .= '<td></td>';
+$this->mLayout .= '<td width="100%" valign="top" align="center" nowrap style="white-space: nowrap" bgcolor="' . $this->mThemeHandler->mColorsSet['tables']['headerbgcolor'] . '">' .
+$localeCatalog->getStr('user_story_header') . "</td>\n";
+$this->mLayout .= '</tr></table></td>';
+
 foreach ($taskStatusList as $id => $status) {
-    $this->mLayout .= "<td style=\"text-align: center; width: {$cellWidth}%;\">$status</td>";
+    $this->mLayout .= '<td valign="top" width="'.$cellWidth.'%"><table cellpadding="4" cellspacing="1" width="100%"><tr>';
+    $this->mLayout .= '<td></td>';
+    $this->mLayout .= '<td width="100%" valign="top" align="center" bgcolor="' . $this->mThemeHandler->mColorsSet['tables']['headerbgcolor'] . '">' .
+    $status . "</td>\n";
+    $this->mLayout .= '</tr></table></td>';
 }
 
-$this->mLayout .= '</tr>';
+$this->mLayout .= "</tr>\n";
 
 $storyCounter = 0;
 foreach ($iterationUserStories as $userStory) {
     $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
-    $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="width: 0%;"><div id="card'.$storyCounter.'" class="card story"><header>'.$userStory['title']."</header></div></td>\n";
+    $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="background-color: white; width: 0%;"><div id="card'.$storyCounter.'" class="card story"><header>'.$userStory['title']."</header></div></td>\n";
 
     // Draw task cards
 
     foreach ($taskStatusList as $statusId => $statusLabel) {
-        $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task"'."style=\"width: {$cellWidth}%;\">";
+        $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
         foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
             if ($taskValues['statusid'] == $statusId) {
                 $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header>'.$taskValues['title'].'</header></div>';
@@ -204,8 +222,10 @@ foreach ($iterationUserStories as $userStory) {
     $this->mLayout .= "</tr>\n";
     $storyCounter++;
 }
+
+$this->mLayout .= '</table></td></tr>' . "\n" . '</table>' . "\n";
+
 $this->mLayout .= '
-    </table>
     </div>
 </td><td style="width: 200px; vertical-align: top;">
     <p>'.$localeCatalog->getStr('increments.label').'</p>
