@@ -9,9 +9,11 @@
   -webkit-user-drag: element;
 }
 #backlog .card {
-  width: 200px;
+  width: 180px;
   background-color: #3f90ea;
   margin: 3px;
+  padding: 5px;
+
   cursor: move;
   color: #fff;
   font-size: 12px;
@@ -71,7 +73,9 @@ float: left;
 #taskboard .cell {
     vertical-align: top;
     text-align: center;
-    margin:10px;padding:10px;border:1px solid white;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid white;
 }
 
 #taskboardtable {
