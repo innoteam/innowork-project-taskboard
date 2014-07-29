@@ -132,6 +132,8 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 </tr>
 </table>
             <div id="backlog">
+<table id="backlogtable">
+<tr><td>
 <div id="backlog" style="width: 200px;">';
 
 foreach ($backlogUserStories as $id => $item) {
@@ -147,6 +149,7 @@ foreach ($backlogUserStories as $id => $item) {
   <div class="card" draggable="true"><header>C</header></div>
 </div>
 -->
+</td></tr></table>
 </div>
 </td><td id="taskboard" class="taskboard" style="vertical-align: top;">
     <table style="width: 100%">
@@ -205,7 +208,7 @@ $this->mLayout .= "</tr>\n";
 $storyCounter = 0;
 foreach ($iterationUserStories as $userStory) {
     $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
-    $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="background-color: white; width: 0%;"><div id="card'.$storyCounter.'" class="card story"><header>'.$userStory['title']."</header></div></td>\n";
+    $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="background-color: white; width: 0%;"><div id="card-userstory-'.$userStory['id'].'" class="card story"><header>'.$userStory['title']."</header></div></td>\n";
 
     // Draw task cards
 
@@ -237,6 +240,10 @@ $this->mLayout .= '
         $this->mLayout .= "<script>
 (function() {
 var dragSrcEl = null;
+
+// ----------------------------------------------------------------------------
+// Backlog reordering and send to taskboard
+// ----------------------------------------------------------------------------
 
 function handleBacklogDragStart(e) {
   this.style.opacity = '0.4';  // this / e.target is the source node.
@@ -335,6 +342,111 @@ function handleBacklogDragEnd(e) {
   });
 }
 
+// ----------------------------------------------------------------------------
+// User Stories reordering and back to backlog
+// ----------------------------------------------------------------------------
+
+function handleUserStoryDragStart(e) {
+  this.style.opacity = '0.4';  // this / e.target is the source node.
+  dragSrcEl = this;
+
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/html', this.innerHTML);
+
+  taskboard = document.getElementById('backlogtable');
+  taskboard.addEventListener('drop', handleToBacklogDrop, false);
+  taskboard.addEventListener('dragover', handleToBacklogDragOver, false);
+  taskboard.addEventListener('dragenter', handleToBacklogDragEnter, false);
+  taskboard.addEventListener('dragleave', handleToBacklogDragLeave, false);
+  //taskboard.style.background = '#f1f1f1';
+  taskboard.classList.add('backlogtarget');
+}
+
+function handleToBacklogDragOver(e) {
+    this.classList.remove('backlogtarget');
+    this.classList.add('backlogover');
+  if (e.preventDefault) {
+    e.preventDefault(); // Necessary. Allows us to drop.
+  }
+
+  e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+
+  return false;
+}
+
+function handleToBacklogDragEnter(e) {
+}
+
+function handleToBacklogDragLeave(e) {
+    this.classList.remove('backlogover');
+    this.classList.add('backlogtarget');
+}
+
+function handleToBacklogDrop(ev) {
+    ev.preventDefault();
+    xajax_WuiTaskboardBackToBacklog(".$taskboardId.", dragSrcEl.id);
+//        var data = ev.dataTransfer.getData('Text');
+//        this.appendChild(document.getElementById(data));
+}
+
+function handleUserStoryDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault(); // Necessary. Allows us to drop.
+  }
+
+  e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+
+  return false;
+}
+
+function handleUserStoryDragEnter(e) {
+  // this / e.target is the current hover target.
+    if (this.parentNode.id == dragSrcEl.parentNode.id) {
+        this.classList.add('over');
+    }
+}
+
+function handleUserStoryDragLeave(e) {
+    this.classList.remove('over');  // this / e.target is previous target element.
+}
+
+function handleUserStoryDrop(e) {
+  // this / e.target is current target element.
+
+  if (e.stopPropagation) {
+    e.stopPropagation(); // stops the browser from redirecting.
+  }
+  // Don't do anything if dropping the same card we're dragging.
+  if (dragSrcEl != this && this.parentNode.id == dragSrcEl.parentNode.id) {
+    // Set the source card's HTML to the HTML of the card we dropped on.
+    dragSrcEl.innerHTML = this.innerHTML;
+    this.innerHTML = e.dataTransfer.getData('text/html');
+  }
+
+  return false;
+}
+
+function handleUserStoryDragEnd(e) {
+  // this/e.target is the source node.
+  this.style.opacity = '1';
+
+  taskboard = document.getElementById('backlogtable');
+  taskboard.classList.remove('backlogtarget');
+    taskboard.classList.remove('backlogover');
+  taskboard.removeEventListener('drop', handleToBacklogDrop, false);
+  taskboard.removeEventListener('dragover', handleToBacklogDragOver, false);
+  taskboard.removeEventListener('dragenter', handleToBacklogDragEnter, false);
+  taskboard.removeEventListener('dragleave', handleToBacklogDragLeave, false);
+
+  [].forEach.call(userstoryCards, function (col) {
+    col.classList.remove('over');
+  });
+}
+
+// ----------------------------------------------------------------------------
+// Task Board tasks
+// ----------------------------------------------------------------------------
+
 function handleTaskboardDragOver(ev) {
     ev.preventDefault();
 }
@@ -384,6 +496,17 @@ var backlogCards = document.querySelectorAll('#backlog .card');
   col.addEventListener('dragend', handleBacklogDragEnd, false);
 });
 
+var userstoryCards = document.querySelectorAll('#taskboard .card.story');
+[].forEach.call(userstoryCards, function(col) {
+  col.setAttribute('draggable', 'true');  // Enable backlog cards to be draggable.
+  col.addEventListener('dragstart', handleUserStoryDragStart, false);
+  col.addEventListener('dragenter', handleUserStoryDragEnter, false);
+  col.addEventListener('dragover', handleUserStoryDragOver, false);
+  col.addEventListener('dragleave', handleUserStoryDragLeave, false);
+  col.addEventListener('drop', handleUserStoryDrop, false);
+  col.addEventListener('dragend', handleUserStoryDragEnd, false);
+});
+
 var taskboardCells = document.querySelectorAll('#taskboard .cell.task');
 [].forEach.call(taskboardCells, function(col) {
   col.addEventListener('drop', handleTaskboardDrop, false);
@@ -422,6 +545,27 @@ var taskboardCards = document.querySelectorAll('#taskboard .card.task');
 
         list($taskType, $taskId) = explode('-', $card);
         $taskboard->addTaskToCurrentIteration($taskType, $taskId);
+
+        $xml = '<taskboard><name>taskboard</name><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
+        $html = WuiXml::getContentFromXml('', $xml);
+        $objResponse->addAssign('taskboard_widget', 'innerHTML', $html);
+
+        return $objResponse;
+    }
+
+    public static function ajaxBackToBacklog($taskBoardId, $card)
+    {
+        $objResponse = new XajaxResponse();
+
+        require_once('innowork/taskboard/InnoworkTaskBoard.php');
+        $taskboard = new InnoworkTaskBoard(
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
+            $taskBoardId
+        );
+
+        list($cardName, $taskType, $taskId) = explode('-', $card);
+        $taskboard->removeTaskFromCurrentIteration($taskType, $taskId);
 
         $xml = '<taskboard><name>taskboard</name><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
         $html = WuiXml::getContentFromXml('', $xml);

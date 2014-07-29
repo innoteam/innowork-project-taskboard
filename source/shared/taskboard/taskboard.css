@@ -9,6 +9,7 @@
   -webkit-user-drag: element;
 }
 #backlog .card {
+  cursor: move;
   width: 180px;
   background-color: #34aadc;
   margin: 3px;
@@ -38,6 +39,10 @@
   */
 float: left;
   font-size: 12px;
+}
+
+#taskboard.card.over {
+  border: 1px dashed #000;
 }
 
 #taskboard .card.task {
@@ -92,3 +97,11 @@ float: left;
   border: 1px dashed green;
 }
 
+
+.backlogtarget {
+    border: 1px dashed #000;
+}
+
+.backlogover {
+  border: 1px dashed green;
+}
