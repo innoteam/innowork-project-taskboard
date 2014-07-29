@@ -41,7 +41,7 @@ float: left;
   font-size: 12px;
 }
 
-#taskboard.card.over {
+#taskboard.card.story.over {
   border: 1px dashed #000;
 }
 

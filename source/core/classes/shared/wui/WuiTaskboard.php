@@ -252,6 +252,14 @@ function handleBacklogDragStart(e) {
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('text/html', this.innerHTML);
 
+    [].forEach.call(backlogCards, function(col) {
+      col.addEventListener('dragenter', handleBacklogDragEnter, false);
+      col.addEventListener('dragover', handleBacklogDragOver, false);
+      col.addEventListener('dragleave', handleBacklogDragLeave, false);
+      col.addEventListener('drop', handleBacklogDrop, false);
+      col.addEventListener('dragend', handleBacklogDragEnd, false);
+    });
+
   taskboard = document.getElementById('taskboardtable');
   taskboard.addEventListener('drop', handleToTaskboardDrop, false);
   taskboard.addEventListener('dragover', handleToTaskboardDragOver, false);
@@ -329,6 +337,14 @@ function handleBacklogDragEnd(e) {
   // this/e.target is the source node.
   this.style.opacity = '1';
 
+    [].forEach.call(backlogCards, function(col) {
+      col.removeEventListener('dragenter', handleBacklogDragEnter, false);
+      col.removeEventListener('dragover', handleBacklogDragOver, false);
+      col.removeEventListener('dragleave', handleBacklogDragLeave, false);
+      col.removeEventListener('drop', handleBacklogDrop, false);
+      col.removeEventListener('dragend', handleBacklogDragEnd, false);
+    });
+
   taskboard = document.getElementById('taskboardtable');
   taskboard.classList.remove('taskboardtarget');
     taskboard.classList.remove('taskboardover');
@@ -360,6 +376,14 @@ function handleUserStoryDragStart(e) {
   taskboard.addEventListener('dragleave', handleToBacklogDragLeave, false);
   //taskboard.style.background = '#f1f1f1';
   taskboard.classList.add('backlogtarget');
+
+    [].forEach.call(userstoryCards, function(col) {
+      col.addEventListener('dragenter', handleUserStoryDragEnter, false);
+      col.addEventListener('dragover', handleUserStoryDragOver, false);
+      col.addEventListener('dragleave', handleUserStoryDragLeave, false);
+      col.addEventListener('drop', handleUserStoryDrop, false);
+      col.addEventListener('dragend', handleUserStoryDragEnd, false);
+    });
 }
 
 function handleToBacklogDragOver(e) {
@@ -401,9 +425,9 @@ function handleUserStoryDragOver(e) {
 
 function handleUserStoryDragEnter(e) {
   // this / e.target is the current hover target.
-    if (this.parentNode.id == dragSrcEl.parentNode.id) {
+    if (this.parentNode.class == dragSrcEl.parentNode.class) {
         this.classList.add('over');
-    }
+   }
 }
 
 function handleUserStoryDragLeave(e) {
@@ -417,7 +441,9 @@ function handleUserStoryDrop(e) {
     e.stopPropagation(); // stops the browser from redirecting.
   }
   // Don't do anything if dropping the same card we're dragging.
-  if (dragSrcEl != this && this.parentNode.id == dragSrcEl.parentNode.id) {
+    //&& this.parentNode.id == dragSrcEl.parentNode.id
+  if (dragSrcEl != this ) {
+alert('ok');
     // Set the source card's HTML to the HTML of the card we dropped on.
     dragSrcEl.innerHTML = this.innerHTML;
     this.innerHTML = e.dataTransfer.getData('text/html');
@@ -440,6 +466,11 @@ function handleUserStoryDragEnd(e) {
 
   [].forEach.call(userstoryCards, function (col) {
     col.classList.remove('over');
+      col.removeEventListener('dragenter', handleUserStoryDragEnter, false);
+      col.removeEventListener('dragover', handleUserStoryDragOver, false);
+      col.removeEventListener('dragleave', handleUserStoryDragLeave, false);
+      col.removeEventListener('drop', handleUserStoryDrop, false);
+      col.removeEventListener('dragend', handleUserStoryDragEnd, false);
   });
 }
 
@@ -458,6 +489,14 @@ function handleTaskboardDragLeave(e) {
 function handleTaskboardDragStart(e) {
   dragSrcEl = this;
     e.dataTransfer.setData('Text', e.target.id);
+
+    [].forEach.call(taskboardCells, function(col) {
+      col.addEventListener('drop', handleTaskboardDrop, false);
+      col.addEventListener('dragover', handleTaskboardDragOver, false);
+      col.addEventListener('dragenter', handleTaskboardDragEnter, false);
+      col.addEventListener('dragleave', handleTaskboardDragLeave, false);
+      col.addEventListener('dragend', handleTaskboardDragEnd, false);
+    });
 }
 
 function handleTaskboardDrop(ev) {
@@ -482,6 +521,11 @@ function handleTaskboardDragEnd(e) {
   this.style.opacity = '1';
   [].forEach.call(taskboardCells, function (col) {
     col.classList.remove('over');
+      col.removeEventListener('drop', handleTaskboardDrop, false);
+      col.removeEventListener('dragover', handleTaskboardDragOver, false);
+      col.removeEventListener('dragenter', handleTaskboardDragEnter, false);
+      col.removeEventListener('dragleave', handleTaskboardDragLeave, false);
+      col.removeEventListener('dragend', handleTaskboardDragEnd, false);
   });
 }
 
@@ -489,32 +533,15 @@ var backlogCards = document.querySelectorAll('#backlog .card');
 [].forEach.call(backlogCards, function(col) {
   col.setAttribute('draggable', 'true');  // Enable backlog cards to be draggable.
   col.addEventListener('dragstart', handleBacklogDragStart, false);
-  col.addEventListener('dragenter', handleBacklogDragEnter, false);
-  col.addEventListener('dragover', handleBacklogDragOver, false);
-  col.addEventListener('dragleave', handleBacklogDragLeave, false);
-  col.addEventListener('drop', handleBacklogDrop, false);
-  col.addEventListener('dragend', handleBacklogDragEnd, false);
 });
 
 var userstoryCards = document.querySelectorAll('#taskboard .card.story');
 [].forEach.call(userstoryCards, function(col) {
   col.setAttribute('draggable', 'true');  // Enable backlog cards to be draggable.
   col.addEventListener('dragstart', handleUserStoryDragStart, false);
-  col.addEventListener('dragenter', handleUserStoryDragEnter, false);
-  col.addEventListener('dragover', handleUserStoryDragOver, false);
-  col.addEventListener('dragleave', handleUserStoryDragLeave, false);
-  col.addEventListener('drop', handleUserStoryDrop, false);
-  col.addEventListener('dragend', handleUserStoryDragEnd, false);
 });
 
 var taskboardCells = document.querySelectorAll('#taskboard .cell.task');
-[].forEach.call(taskboardCells, function(col) {
-  col.addEventListener('drop', handleTaskboardDrop, false);
-  col.addEventListener('dragover', handleTaskboardDragOver, false);
-  col.addEventListener('dragenter', handleTaskboardDragEnter, false);
-  col.addEventListener('dragleave', handleTaskboardDragLeave, false);
-  col.addEventListener('dragend', handleTaskboardDragEnd, false);
-});
 
 var taskboardCards = document.querySelectorAll('#taskboard .card.task');
 [].forEach.call(taskboardCards, function(col) {
