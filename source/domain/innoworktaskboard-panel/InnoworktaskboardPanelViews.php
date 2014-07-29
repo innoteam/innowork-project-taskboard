@@ -102,6 +102,11 @@ $this->toolbars['taskboards'] = array(
     {
         $currentTaskBoard = 0;
 
+        $taskboardWidget = new \Shared\Wui\WuiTaskboard('taskboard');
+        if (isset($taskboardWidget->mArgs['taskboardid'])) {
+            $currentTaskBoard = $taskboardWidget->mArgs['taskboardid'];
+        }
+
         // Build the list of the available task boards
         $taskboard = InnoworkCore::getItem('taskboard');
         $taskboardSearchResults = $taskboard->search(
@@ -113,20 +118,21 @@ $this->toolbars['taskboards'] = array(
 
         // If there is no task board, give the no task boards found message
         if (count($taskboardSearchResults) == 0) {
+            $taskboardsComboList[0] = 'No board available';
             // @todo
-        }
-
-        // Check if the saved current board still exists/is accessible
-        if (!isset($taskboardSearchResults[$currentTaskBoard])) {
-            $currentTaskBoard = 0;
-        }
-
-        // Build the task board combo list
-        foreach ($taskboardSearchResults as $id => $taskboardValues) {
-            if ($currentTaskBoard == 0) {
-                $currentTaskBoard = $id;
+        } else {
+            // Check if the saved current board still exists/is accessible
+            if (!isset($taskboardSearchResults[$currentTaskBoard])) {
+                $currentTaskBoard = 0;
             }
-            $taskboardsComboList[$id] = $taskboardValues['title'];
+
+            // Build the task board combo list
+            foreach ($taskboardSearchResults as $id => $taskboardValues) {
+                if ($currentTaskBoard == 0) {
+                    $currentTaskBoard = $id;
+                }
+                $taskboardsComboList[$id] = $taskboardValues['title'];
+            }
         }
 
         $this->xml = '<vertgroup><children>
@@ -151,7 +157,7 @@ $this->toolbars['taskboards'] = array(
                 <divframe><args><id>taskboard_widget</id></args><children>';
 
         if ($currentTaskBoard != 0 and strlen($currentTaskBoard)) {
-            $this->xml .= '<taskboard><args><taskboardid>'.$currentTaskBoard.'</taskboardid></args></taskboard>';
+            $this->xml .= '<taskboard><name>taskboard</name><args><taskboardid>'.$currentTaskBoard.'</taskboardid></args></taskboard>';
         } else {
             $this->xml .= '<void/>';
         }

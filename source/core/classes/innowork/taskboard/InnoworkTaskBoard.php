@@ -24,7 +24,7 @@ class InnoworkTaskBoard extends InnoworkItem
 
         $this->mViewableSearchResultKeys[] = 'title';
 
-        $this->mSearchOrderBy = 'title DESC';
+        $this->mSearchOrderBy = 'title';
         $this->mShowDispatcher = 'view';
         $this->mShowEvent = 'showtaskboard';
     }

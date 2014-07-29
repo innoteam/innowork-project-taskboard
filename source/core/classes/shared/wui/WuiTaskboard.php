@@ -3,6 +3,8 @@ namespace Shared\Wui;
 
 class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 {
+    public $mUseSession = 'true';
+
     public function __construct (
         $elemName,
         $elemArgs = '',
@@ -10,6 +12,15 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         $dispEvents = ''
     ) {
         parent::__construct($elemName, $elemArgs, $elemTheme, $dispEvents);
+
+        if (!isset($this->mArgs['taskboardid'])) {
+            $args = $this->retrieveSession();
+            if (isset($args['taskboardid'])) {
+                $this->mArgs['taskboardid'] = $args['taskboardid'];
+            }
+        } else {
+            $this->storeSession($this->mArgs);
+        }
     }
 
     protected function generateSource()
@@ -391,7 +402,7 @@ var taskboardCards = document.querySelectorAll('#taskboard .card.task');
         list($taskType, $taskId) = explode('-', $card);
         $taskboard->addTaskToCurrentIteration($taskType, $taskId);
 
-        $xml = '<taskboard><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
+        $xml = '<taskboard><name>taskboard</name><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
         $html = WuiXml::getContentFromXml('', $xml);
         $objResponse->addAssign('taskboard_widget', 'innerHTML', $html);
 
@@ -412,7 +423,7 @@ var taskboardCards = document.querySelectorAll('#taskboard .card.task');
         list($cardName, $taskType, $taskId) = explode('-', $card);
         $taskboard->setTaskStatus($taskType, $taskId, $statusId);
 
-        $xml = '<taskboard><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
+        $xml = '<taskboard><name>taskboard</name><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
         $html = WuiXml::getContentFromXml('', $xml);
         $objResponse->addAssign('taskboard_widget', 'innerHTML', $html);
 
@@ -423,7 +434,7 @@ var taskboardCards = document.querySelectorAll('#taskboard .card.task');
     {
         $objResponse = new XajaxResponse();
 
-        $xml = '<taskboard><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
+        $xml = '<taskboard><name>taskboard</name><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
         $html = WuiXml::getContentFromXml('', $xml);
         $objResponse->addAssign('taskboard_widget', 'innerHTML', $html);
 
