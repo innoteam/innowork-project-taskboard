@@ -32,19 +32,20 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
 
     public function executeNewtaskboard($eventData)
     {
-        if (!\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->hasPermission('add_taskboards')) {
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
+
+        if (!$innomaticCore->getCurrentUser()->hasPermission('add_taskboards')) {
             return;
         }
 
     	require_once('innowork/taskboard/InnoworkTaskBoard.php');
     	$board = new InnoworkTaskBoard(
-    		\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-    		\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+    		$innomaticCore->getDataAccess(),
+    		$innomaticCore->getCurrentDomain()->getDataAccess()
     	);
 
     	if ($board->create($eventData)) {
             $this->taskboardId = $board->mItemId;
-    		$GLOBALS['innowork-projects-taskboard']['newboardid'] = $board->mItemId;
     		//$this->status = $this->localeCatalog->getStr('bug_created.status');
     	} else {
     		//$this->status = $this->localeCatalog->getStr('bug_not_created.status');
@@ -55,4 +56,21 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
     	$this->notifyObservers('status');
     }
 
+    public function executeEdittaskboard($eventData)
+    {
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
+
+        if (!$innomaticCore->getCurrentUser()->hasPermission('add_taskboards')) {
+            return;
+        }
+
+        require_once('innowork/taskboard/InnoworkTaskBoard.php');
+        $board = new InnoworkTaskBoard(
+            $innomaticCore->getDataAccess(),
+            $innomaticCore->getCurrentDomain()->getDataAccess(),
+            $eventData['id']
+        );
+
+        $board->edit($eventData);
+    }
 }

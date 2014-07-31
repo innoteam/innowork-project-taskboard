@@ -290,6 +290,8 @@ $this->toolbars['taskboards'] = array(
 
     public function viewSettings($eventData)
     {
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
+
         if ($this->taskboardId != 0) {
             $taskboardId = $this->taskboardId;
         } else {
@@ -297,14 +299,190 @@ $this->toolbars['taskboards'] = array(
         }
 
         $taskboard = new InnoworkTaskboard(
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
+            $innomaticCore->getDataAccess(),
+            $innomaticCore->getCurrentDomain()->getDataAccess(),
             $taskboardId
         );
 
-        $taskboardData = $taskboard->getItem(\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId());
+        $taskboardData = $taskboard->getItem($innomaticCore->getCurrentUser()->getUserId());
+
+        // Projects list
+
+        $innoworkProjects = new InnoworkProject(
+            $innomaticCore->getDataAccess(),
+            $innomaticCore->getCurrentDomain()->getDataAccess()
+        );
+
+        $projectsSearchResults = $innoworkProjects->search('', $innomaticCore->getCurrentUser()->getUserId());
+
+        if (count($projectsSearchResults) == 0) {
+            $projects['0'] = $this->localeCatalog->getStr('noproject_label');
+        }
+
+        while (list($id, $fields) = each($projectsSearchResults)) {
+            $projects[$id] = $fields['name'];
+        }
+
+        // Archived taskboard?
+
+        if ($taskboardData['done'] == $innomaticCore->getCurrentDomain()->getDataAccess()->fmttrue) {
+            $done_icon = 'misc3';
+            $done_action = 'false';
+            $done_label = 'reopen_taskboard_button';
+        } else {
+            $done_icon = 'drawer';
+            $done_action = 'true';
+            $done_label = 'archive_taskboard_button';
+        }
+
+        $headers[0]['label'] = $this->localeCatalog->getStr('taskboard_settings_header').(strlen($taskboardData['title']) ? ' - '.$taskboardData['title'] : '');
+
 
         $this->xml = '<horizgroup><children>
+
+    <table><name>task</name>
+      <args>
+        <headers type="array">'.WuiXml::encode($headers).'</headers>
+      </args>
+      <children>
+
+        <form row="0" col="0"><name>task</name>
+          <args>
+                <action>'.WuiXml::cdata(
+                            \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString(
+                                    '',
+                                    array(
+                                            array('view', 'settings', array('taskboardid' => $taskboardId)),
+                                            array('action', 'edittaskboard', array('id' => $taskboardId))
+                                    )
+                            )
+                    ).'</action>
+          </args>
+          <children>
+
+            <vertgroup>
+              <children>
+
+                <horizgroup><args><width>0%</width></args>
+                  <children>
+
+                    <label>
+                      <args>
+                        <label>'.$this->localeCatalog->getStr('title_label').'</label>
+                      </args>
+                    </label>
+
+                    <string><name>title</name>
+                      <args>
+                        <disp>action</disp>
+                        <size>60</size>
+                        <value>'.WuiXml::cdata($taskboardData['title']).'</value>
+                      </args>
+                    </string>
+
+                  </children>
+                </horizgroup>
+
+              </children>
+            </vertgroup>
+
+          </children>
+        </form>
+
+        <horizgroup row="1" col="0">
+          <args><width>0%</width></args>
+          <children>
+            <button>
+              <args>
+                <themeimage>buttonok</themeimage>
+                <label>'.WuiXml::cdata($this->localeCatalog->getStr('update_settings_button')).'</label>
+                <formsubmit>task</formsubmit>
+                <mainaction>true</mainaction>
+                <frame>false</frame>
+                <horiz>true</horiz>
+                <action>'.WuiXml::cdata(
+                            \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString(
+                                    '',
+                                    array(
+                                            array(
+                                                    'view',
+                                                    'settings',
+                                                    array(
+                                                            'taskboardid' => $taskboardId
+                                                    )
+                                            ),
+                                            array(
+                                                    'action',
+                                                    'edittaskboard',
+                                                    array(
+                                                            'id' => $taskboardId
+                                                    )
+                                            )
+                                    )
+                            )
+                    ).'</action>
+              </args>
+            </button>
+
+        <button><name>setdone</name>
+          <args>
+            <themeimage>'.$done_icon.'</themeimage>
+            <horiz>true</horiz>
+            <frame>false</frame>
+            <action>'.WuiXml::cdata(\Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString('', array(
+                        array(
+                                'view',
+                                'settings',
+                                array('taskboardid' => $taskboardId)
+                        ),
+                        array(
+                                'action',
+                                'edittaskboard',
+                                array(
+                                        'id' => $taskboardId,
+                                        'done' => $done_action
+                                ))
+                ))).'</action>
+            <label>'.WuiXml::cdata($this->localeCatalog->getStr($done_label)).'</label>
+            <formsubmit>task</formsubmit>
+          </args>
+        </button>
+
+            <button>
+              <args>
+                <themeimage>trash</themeimage>
+                <label>'.WuiXml::cdata($this->localeCatalog->getStr('trash_taskboard_button')).'</label>
+                <frame>false</frame>
+                <horiz>true</horiz>
+                <dangeraction>true</dangeraction>
+                <needconfirm>true</needconfirm>
+                <confirmmessage>'.$this->localeCatalog->getStr('remove_taskboard_confirm').'</confirmmessage>
+                <action>'.WuiXml::cdata(
+                            \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString(
+                                    '',
+                                    array(
+                                            array(
+                                                    'view',
+                                                    'default'
+                                            ),
+                                            array(
+                                                    'action',
+                                                    'trashtaskboard',
+                                                    array(
+                                                            'id' => $eventData['id']
+                                                    )
+                                            )
+                                    )
+                            )
+                    ).'</action>
+              </args>
+            </button>
+
+          </children>
+        </horizgroup>
+
+      </children>
+    </table>
 
   <innoworkitemacl><name>itemacl</name>
     <args>
