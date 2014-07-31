@@ -14,7 +14,7 @@ class InnoworkTaskBoard extends InnoworkItem
 
     public function __construct($rrootDb, $rdomainDA, $storyId = 0)
     {
-        parent::__construct($rrootDb, $rdomainDA, InnoworkUserStory::ITEM_TYPE, $storyId);
+        parent::__construct($rrootDb, $rdomainDA, self::ITEM_TYPE, $storyId);
 
         $this->mKeys['title'] = 'text';
         $this->mKeys['done'] = 'boolean';

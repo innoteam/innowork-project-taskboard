@@ -154,10 +154,10 @@ foreach ($backlogUserStories as $id => $item) {
 <td>'.$localeCatalog->getStr('currentiteration.label').'</td>
 <td style="align: right">';
 
-$this->mLayout .= WuiXml::getContentFromXml('', '            <button>
+$buttonsXml = '<horizgroup><args><width>0%</width></args><children>            <button>
               <args>
                 <themeimage>cycle</themeimage>
-                <label>'.$localeCatalog->getstr('refreshboard.button').'</label>
+                <label>'.$localeCatalog->getstr('refreshboard_button').'</label>
                 <frame>false</frame>
                 <horiz>true</horiz>
                 <action>javascript:void(0)</action>
@@ -168,7 +168,27 @@ $this->mLayout .= WuiXml::getContentFromXml('', '            <button>
                   </click>
                   </events>
             </button>
-');
+            ';
+
+    if (\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->hasPermission('add_taskboards')) {
+        $buttonsXml .= '<button>
+              <args>
+                <themeimage>settings1</themeimage>
+                <label>'.$localeCatalog->getstr('boardsettings_button').'</label>
+                <frame>false</frame>
+                <horiz>true</horiz>
+                <action>'.WuiXml::cdata(
+                            \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString(
+                                '',
+                                array(array('view', 'settings', array('taskboardid' => $taskboardId)))
+                            )).'</action>
+            </args>
+            </button>';
+    }
+
+$buttonsXml .= '</children></horizgroup>';
+
+$this->mLayout .= WuiXml::getContentFromXml('', $buttonsXml);
 $this->mLayout .= '
 </td>
 </tr>

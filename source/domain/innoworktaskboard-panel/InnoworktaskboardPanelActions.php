@@ -11,6 +11,7 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
 {
     private $localeCatalog;
     public $status;
+    public $taskboardId;
 
     public function __construct(\Innomatic\Desktop\Panel\PanelController $controller)
     {
@@ -42,6 +43,7 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
     	);
 
     	if ($board->create($eventData)) {
+            $this->taskboardId = $board->mItemId;
     		$GLOBALS['innowork-projects-taskboard']['newboardid'] = $board->mItemId;
     		//$this->status = $this->localeCatalog->getStr('bug_created.status');
     	} else {
@@ -49,6 +51,7 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
     	}
 
     	$this->setChanged();
+        $this->notifyObservers('taskboardid');
     	$this->notifyObservers('status');
     }
 

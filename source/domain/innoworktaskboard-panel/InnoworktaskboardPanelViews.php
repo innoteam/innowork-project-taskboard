@@ -13,6 +13,7 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
     public $pageTitle;
     public $toolbars;
     public $pageStatus;
+    public $taskboardId = 0;
     public $innoworkCore;
     public $xml;
     protected $localeCatalog;
@@ -21,7 +22,10 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
     {
         switch ($arg) {
             case 'status':
-                $this->pageStatus = $this->_controller->getAction()->status;
+                $this->pageStatus = $this->controller->getAction()->status;
+                break;
+            case 'taskboardid':
+                $this->taskboardId = $this->controller->getAction()->taskboardId;
                 break;
         }
     }
@@ -213,7 +217,7 @@ $this->toolbars['taskboards'] = array(
                                     array(
                                             array(
                                                     'view',
-                                                    'default'
+                                                    'settings'
                                             ),
                                             array(
                                                     'action',
@@ -262,7 +266,7 @@ $this->toolbars['taskboards'] = array(
                                     array(
                                             array(
                                                     'view',
-                                                    'default'
+                                                    'settings'
                                             ),
                                             array(
                                                     'action',
@@ -282,6 +286,36 @@ $this->toolbars['taskboards'] = array(
 
   </children>
 </vertgroup>';
+    }
+
+    public function viewSettings($eventData)
+    {
+        if ($this->taskboardId != 0) {
+            $taskboardId = $this->taskboardId;
+        } else {
+            $taskboardId = $eventData['taskboardid'];
+        }
+
+        $taskboard = new InnoworkTaskboard(
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
+            $taskboardId
+        );
+
+        $taskboardData = $taskboard->getItem(\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId());
+
+        $this->xml = '<horizgroup><children>
+
+  <innoworkitemacl><name>itemacl</name>
+    <args>
+      <itemtype>taskboard</itemtype>
+      <itemid>'.$taskboardId.'</itemid>
+      <itemownerid>'.$taskboardData['ownerid'].'</itemownerid>
+      <defaultaction>'.WuiXml::cdata(\Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString('', array(
+            array('view', 'settings', array('taskboardid' => $taskboardId))))).'</defaultaction>
+    </args>
+  </innoworkitemacl>
+            </children></horizgroup>';
     }
 
     public function viewShowtask(
