@@ -104,6 +104,8 @@ $this->toolbars['taskboards'] = array(
 
     public function viewDefault($eventData)
     {
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
+
         $currentTaskBoard = 0;
 
         $taskboardWidget = new \Shared\Wui\WuiTaskboard('taskboard');
@@ -111,16 +113,25 @@ $this->toolbars['taskboards'] = array(
             $currentTaskBoard = $taskboardWidget->mArgs['taskboardid'];
         }
 
+        // Archived taskboards?
+        if ($eventData['done'] == 'true') {
+            $doneBoards = true;
+            $doneFlag   = $innomaticCore->getCurrentDomain()->getDataAccess()->fmttrue;
+        } else {
+            $doneBoards = false;
+            $doneFlag   = $innomaticCore->getCurrentDomain()->getDataAccess()->fmtfalse;
+        }
+
         // Build the list of the available task boards
         $taskboard = InnoworkCore::getItem('taskboard');
         $taskboardSearchResults = $taskboard->search(
-            array('done' => \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess()->fmtfalse),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId()
+            array('done' => $doneFlag),
+            $innomaticCore->getCurrentUser()->getUserId()
         );
 
         $this->xml = '<vertgroup><children>
             <raw><args><content>'.WuiXml::cdata('<link rel="stylesheet" type="text/css" href="'.
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getExternalBaseUrl().'/shared/taskboard/taskboard.css">').'</content></args></raw>';
+            $innomaticCore->getExternalBaseUrl().'/shared/taskboard/taskboard.css">').'</content></args></raw>';
 
         $taskboardsComboList = array();
 
@@ -161,7 +172,7 @@ $this->toolbars['taskboards'] = array(
             $this->xml .= '        <divframe><args><id>taskboard_widget</id></args><children>';
 
             if ($currentTaskBoard != 0 and strlen($currentTaskBoard)) {
-                $this->xml .= '<taskboard><name>taskboard</name><args><taskboardid>'.$currentTaskBoard.'</taskboardid></args></taskboard>';
+                $this->xml .= '<taskboard><name>taskboard</name><args><taskboardid>'.$currentTaskBoard.'</taskboardid><archived>'.($doneBoards ? 'true' : 'false').'</archived></args></taskboard>';
             } else {
                 $this->xml .= '<void/>';
             }
