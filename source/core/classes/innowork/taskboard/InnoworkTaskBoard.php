@@ -36,26 +36,26 @@ class InnoworkTaskBoard extends InnoworkItem
     {
         $result = false;
 
-            if ( $params['done'] == 'true' ) $params['done'] = $this->mrDomainDA->fmttrue;
-            else $params['done'] = $this->mrDomainDA->fmtfalse;
+        if ($params['done'] == 'true') $params['done'] = $this->mrDomainDA->fmttrue;
+        else $params['done'] = $this->mrDomainDA->fmtfalse;
 
         if (count($params)) {
-            $item_id = $this->mrDomainDA->getNextSequenceValue( $this->mTable.'_id_seq' );
+            $item_id = $this->mrDomainDA->getNextSequenceValue($this->mTable.'_id_seq');
 
             $params['trashed'] = $this->mrDomainDA->fmtfalse;
 
             $key_pre = $value_pre = $keys = $values = '';
 
-            while ( list( $key, $val ) = each( $params ) ) {
+            while (list($key, $val) = each($params)) {
                 $key_pre = ',';
                 $value_pre = ',';
 
-                switch ( $key ) {
+                switch ($key) {
                 case 'title':
                 case 'done':
                 case 'trashed':
                     $keys .= $key_pre.$key;
-                    $values .= $value_pre.$this->mrDomainDA->formatText( $val );
+                    $values .= $value_pre.$this->mrDomainDA->formatText($val);
                     break;
 
                 default:
@@ -63,12 +63,12 @@ class InnoworkTaskBoard extends InnoworkItem
                 }
             }
 
-            if ( strlen( $values ) ) {
-                if ( $this->mrDomainDA->Execute( 'INSERT INTO '.$this->mTable.' '.
+            if (strlen($values)) {
+                if ($this->mrDomainDA->Execute('INSERT INTO '.$this->mTable.' '.
                                                '(id,ownerid'.$keys.') '.
                                                'VALUES ('.$item_id.','.
                                                $userId.
-                                               $values.')' ) )
+                                               $values.')'))
                 {
                     $result = $item_id;
                 }
@@ -84,24 +84,24 @@ class InnoworkTaskBoard extends InnoworkItem
     {
         $result = false;
 
-        if ( $this->mItemId ) {
-            if ( count( $params ) ) {
+        if ($this->mItemId) {
+            if (count($params)) {
                 $start = 1;
                 $update_str = '';
 
-                if ( isset($params['done'] ) ) {
-                    if ( $params['done'] == 'true' ) $params['done'] = $this->mrDomainDA->fmttrue;
+                if (isset($params['done'])) {
+                    if ($params['done'] == 'true') $params['done'] = $this->mrDomainDA->fmttrue;
                     else $params['done'] = $this->mrDomainDA->fmtfalse;
                 }
 
-                while ( list( $field, $value ) = each( $params ) ) {
-                    if ( $field != 'id' ) {
-                        switch ( $field ) {
+                while (list($field, $value) = each($params)) {
+                    if ($field != 'id') {
+                        switch ($field) {
                         case 'title':
                         case 'done':
                         case 'trashed':
-                            if ( !$start ) $update_str .= ',';
-                            $update_str .= $field.'='.$this->mrDomainDA->formatText( $value );
+                            if (!$start) $update_str .= ',';
+                            $update_str .= $field.'='.$this->mrDomainDA->formatText($value);
                             $start = 0;
                             break;
 
@@ -114,9 +114,9 @@ class InnoworkTaskBoard extends InnoworkItem
                 $query = &$this->mrDomainDA->Execute(
                     'UPDATE '.$this->mTable.' '.
                     'SET '.$update_str.' '.
-                    'WHERE id='.$this->mItemId );
+                    'WHERE id='.$this->mItemId);
 
-                if ( $query ) $result = true;
+                if ($query) $result = true;
             }
         }
 
@@ -137,7 +137,7 @@ class InnoworkTaskBoard extends InnoworkItem
         $result = $this->mrDomainDA->Execute(
             'DELETE FROM '.$this->mTable.' '.
             'WHERE id='.$this->mItemId
-            );
+           );
 
         return $result;
     }
@@ -260,20 +260,20 @@ class InnoworkTaskBoard extends InnoworkItem
 '<vertgroup>
   <children>';
 
-        foreach ( $userstories_search as $story ) {
+        foreach ($userstories_search as $story) {
             $result .=
 '<link>
   <args>
-    <label type="encoded">'.urlencode( '- '.$story['id'] ).'</label>
+    <label type="encoded">'.urlencode('- '.$story['id']).'</label>
     <link type="encoded">'.urlencode(
-        WuiEventsCall::buildEventsCallString( 'innoworktaskboard', array(
+        WuiEventsCall::buildEventsCallString('innoworktaskboard', array(
                 array(
                     'view',
                     'showtaskboard',
-                    array( 'id' => $story['id'] )
+                    array('id' => $story['id'])
                 )
-            ) )
-        ).'</link>
+            ))
+       ).'</link>
     <compact>true</compact>
   </args>
 </link>';
