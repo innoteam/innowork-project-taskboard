@@ -73,4 +73,22 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
 
         $board->edit($eventData);
     }
+
+    public function executeTrashtaskboard($eventData)
+    {
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
+
+        if (!$innomaticCore->getCurrentUser()->hasPermission('add_taskboards')) {
+            return;
+        }
+
+        require_once('innowork/taskboard/InnoworkTaskBoard.php');
+        $board = new InnoworkTaskBoard(
+            $innomaticCore->getDataAccess(),
+            $innomaticCore->getCurrentDomain()->getDataAccess(),
+            $eventData['id']
+        );
+
+        $board->trash($innomaticCore->getCurrentUser()->getUserId());
+    }
 }

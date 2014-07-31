@@ -480,7 +480,7 @@ $this->toolbars['taskboards'] = array(
                                                     'action',
                                                     'trashtaskboard',
                                                     array(
-                                                            'id' => $eventData['id']
+                                                            'id' => $taskboardId
                                                     )
                                             )
                                     )
