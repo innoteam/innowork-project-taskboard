@@ -106,7 +106,11 @@ $this->toolbars['taskboards'] = array(
     {
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
 
-        $currentTaskBoard = 0;
+        if (isset($eventData['taskboardid'])) {
+            $currentTaskBoard = $eventData['taskboardid'];
+        } else {
+            $currentTaskBoard = 0;
+        }
 
         $taskboardWidget = new \Shared\Wui\WuiTaskboard('taskboard');
         if (isset($taskboardWidget->mArgs['taskboardid'])) {
@@ -207,6 +211,7 @@ $this->toolbars['taskboards'] = array(
             $projects[$id] = $fields['name'];
         }
 
+        // Table header with back to taskboard link
         $headers[0]['label'] = $this->localeCatalog->getStr('newtaskboard.header');
 
         $this->xml =
@@ -347,7 +352,10 @@ $this->toolbars['taskboards'] = array(
         }
 
         $headers[0]['label'] = $this->localeCatalog->getStr('taskboard_settings_header').(strlen($taskboardData['title']) ? ' - '.$taskboardData['title'] : '');
-
+        $headers[0]['link'] = \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString(
+                '',
+                array(array('view', 'default', array('taskboardid' => $eventData['id'])))
+            );
 
         $this->xml = '<horizgroup><children>
 
