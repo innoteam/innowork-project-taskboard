@@ -138,7 +138,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 
         $this->mLayout .= '<table style="width: 100%; padding: 5px;">
     <tr>
-        <td style="width: 200px; vertical-align: top;">
+        <td style="width: 250px; vertical-align: top;">
 <table>
 <tr>
 <td>'.$localeCatalog->getStr('productbacklog.label').'</td>
@@ -147,7 +147,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             <div id="backlog">
 <table id="backlogtable">
 <tr><td>
-<div id="backlog" style="width: 200px;">';
+<div id="backlog" style="width: 250px;">';
 
 // Backlog items (user stories, tasks, bugs)
 foreach ($backlogItems as $itemTypeId => $item) {
