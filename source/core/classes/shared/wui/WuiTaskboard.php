@@ -154,7 +154,7 @@ foreach ($backlogUserStories as $id => $item) {
 <td>'.$localeCatalog->getStr('currentiteration.label').'</td>
 <td style="align: right">';
 
-$buttonsXml = '<horizgroup><args><width>0%</width></args><children>            <button>
+$buttonsXml = '<horizgroup><args><width>0%</width><groupalign>right</groupalign></args><children>            <button>
               <args>
                 <themeimage>cycle</themeimage>
                 <label>'.$localeCatalog->getstr('refreshboard_button').'</label>
