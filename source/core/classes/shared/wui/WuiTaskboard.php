@@ -251,7 +251,7 @@ foreach ($iterationUserStories as $userStory) {
     $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
     $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="background-color: white; width: 0%;">
         <div id="card-userstory-'.$userStory['id'].'" class="card story">
-        <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStory['id'].'</a> - '.mb_strimwidth($userStory['title'], 0, 65, '...')."</header>
+        <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStory['id'].'</a> - '.mb_strimwidth($userStory['title'], 0, 58, '...')."</header>
         </div></td>\n";
 
     // Draw task cards
@@ -260,7 +260,7 @@ foreach ($iterationUserStories as $userStory) {
         $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
         foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
             if ($taskValues['statusid'] == $statusId) {
-                $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$taskValues['id'].'</a> - '.mb_strimwidth($taskValues['title'], 0, 65, '...').'</header></div>';
+                $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$taskValues['id'].'</a> - '.mb_strimwidth($taskValues['title'], 0, 58, '...').'</header></div>';
             }
         }
         $this->mLayout .= "</td>\n";
