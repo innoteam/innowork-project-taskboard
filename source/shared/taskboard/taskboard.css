@@ -28,6 +28,18 @@
     font-size: 12px;
 }
 
+#backlog .card.userstory {
+    background-color: #269df4;
+}
+
+#backlog .card.task {
+    background-color: #37cef9;
+}
+
+#backlog .card.bug {
+    background-color: #97e6fb;
+}
+
 #backlog .card.over {
     border: 1px dashed #000;
 }
