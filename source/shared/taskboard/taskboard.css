@@ -1,73 +1,74 @@
 /* Prevent the text contents of draggable elements from being selectable. */
 [draggable] {
-  -moz-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  user-select: none;
-  /* Required to make elements draggable in old WebKit */
-  -khtml-user-drag: element;
-  -webkit-user-drag: element;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    /* Required to make elements draggable in old WebKit */
+    -khtml-user-drag: element;
+    -webkit-user-drag: element;
 }
-#backlog .card {
-  cursor: move;
-  width: 180px;
-  background-color: #34aadc;
-  margin: 3px;
-  padding: 5px;
 
-  cursor: move;
-  color: #fff;
-  font-size: 12px;
+#backlog .card {
+    cursor: move;
+    width: 180px;
+    background-color: #34aadc;
+    margin: 3px;
+    padding: 5px;
+    cursor: move;
+    color: #fff;
+    font-size: 12px;
 }
+
 #backlog .card header {
-  color: #fff;
-  padding: 5px;
-  background-color: #dce6f3;
-  border-bottom: 1px solid #ddd;
-  font-size: 12px;
+    color: #fff;
+    padding: 5px;
+    background-color: #dce6f3;
+    border-bottom: 1px solid #ddd;
+    font-size: 12px;
 }
 
 #backlog .card.over {
-  border: 1px dashed #000;
+    border: 1px dashed #000;
 }
 
 #taskboard .card {
-  margin: 3px;
+    margin: 3px;
   /*
   margin-left: auto;
   margin-right: auto;
   */
-float: left;
-  font-size: 12px;
+    float: left;
+    font-size: 12px;
 }
 
 #taskboard.card.story.over {
-  border: 1px dashed #000;
+    border: 1px dashed #000;
 }
 
 #taskboard .card.task {
-  cursor: move;
-  height: 75px;
-  width: 120px;
-  background-color: #ffcc00;
-  color: black;
-  font-weight: 300;
+    cursor: move;
+    height: 75px;
+    width: 120px;
+    background-color: #ffcc00;
+    color: black;
+    font-weight: 300;
 }
 
 #taskboard .card.story {
-  height: 90px;
-  width: 140px;
+    height: 90px;
+    width: 140px;
     background-color: #ff2d55;
     color: black;
 }
 
 #taskboard .card header {
-  padding: 5px;
-  /*
-  background-color: #cecece;
-  border-bottom: 1px solid #ddd;
-  */
-  border-top-right-radius: 4px;
+    padding: 5px;
+    /*
+    background-color: #cecece;
+    border-bottom: 1px solid #ddd;
+    */
+    border-top-right-radius: 4px;
 }
 
 #taskboard .cell.over {
@@ -94,14 +95,13 @@ float: left;
 }
 
 .taskboardover {
-  border: 1px dashed green;
+    border: 1px dashed green;
 }
-
 
 .backlogtarget {
     border: 1px dashed #000;
 }
 
 .backlogover {
-  border: 1px dashed green;
+    border: 1px dashed green;
 }
