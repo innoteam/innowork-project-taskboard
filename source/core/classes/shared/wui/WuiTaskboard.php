@@ -401,6 +401,17 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
     }
     /* }}} */
 
+    /* public ajaxUpdateTaskStatus($taskBoardId, $card, $statusId) {{{ */
+    /**
+     * Ajax call to update task status column.
+     *
+     * @param integer $taskBoardId Taskboard id
+     * @param string $card Card name in the "card-<tasktype>-<taskid>" format
+     * @param integer $statusId New status id
+     * @static
+     * @access public
+     * @return XajaxResponse
+     */
     public static function ajaxUpdateTaskStatus($taskBoardId, $card, $statusId)
     {
         $objResponse = new XajaxResponse();
@@ -421,7 +432,18 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 
         return $objResponse;
     }
+    /* }}} */
 
+    /* public ajaxRefreshBoard($taskBoardId) {{{ */
+    /**
+     * Ajax call to refresh the whole taskboard (including the product backlog
+     * and the previous iterations list).
+     *
+     * @param integer $taskBoardId Taskboard id
+     * @static
+     * @access public
+     * @return XajaxResponse
+     */
     public static function ajaxRefreshBoard($taskBoardId)
     {
         $objResponse = new XajaxResponse();
@@ -432,4 +454,5 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 
         return $objResponse;
     }
+    /* }}} */
 }
