@@ -4,12 +4,13 @@ require_once('innowork/core/InnoworkItem.php');
 
 class InnoworkTaskBoard extends InnoworkItem
 {
+
     public $mTable = 'innowork_taskboards';
     public $mNewDispatcher = 'view';
     public $mNewEvent = 'newtaskboard';
     public $mNoTrash = false;
     public $mConvertible = false;
-    //public $mTypeTags = array('task');
+
     const ITEM_TYPE = 'taskboard';
 
     public function __construct($rrootDb, $rdomainDA, $storyId = 0)
@@ -29,18 +30,18 @@ class InnoworkTaskBoard extends InnoworkItem
         $this->mShowEvent = 'showtaskboard';
     }
 
-    public function doCreate(
-        $params,
-        $userId
-        )
+    public function doCreate($params, $userId)
     {
         $result = false;
 
-        if ($params['done'] == 'true') $params['done'] = $this->mrDomainDA->fmttrue;
-        else $params['done'] = $this->mrDomainDA->fmtfalse;
+        if ($params['done'] == 'true') {
+            $params['done'] = $this->mrDomainDA->fmttrue;
+        } else {
+            $params['done'] = $this->mrDomainDA->fmtfalse;
+        }
 
         if (count($params)) {
-            $item_id = $this->mrDomainDA->getNextSequenceValue($this->mTable.'_id_seq');
+            $item_id = $this->mrDomainDA->getNextSequenceValue($this->mTable . '_id_seq');
 
             $params['trashed'] = $this->mrDomainDA->fmtfalse;
 
@@ -51,25 +52,26 @@ class InnoworkTaskBoard extends InnoworkItem
                 $value_pre = ',';
 
                 switch ($key) {
-                case 'title':
-                case 'done':
-                case 'trashed':
-                    $keys .= $key_pre.$key;
-                    $values .= $value_pre.$this->mrDomainDA->formatText($val);
-                    break;
+                    case 'title':
+                    case 'done':
+                    case 'trashed':
+                        $keys .= $key_pre . $key;
+                        $values .= $value_pre . $this->mrDomainDA->formatText($val);
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
                 }
             }
 
             if (strlen($values)) {
-                if ($this->mrDomainDA->Execute('INSERT INTO '.$this->mTable.' '.
-                                               '(id,ownerid'.$keys.') '.
-                                               'VALUES ('.$item_id.','.
-                                               $userId.
-                                               $values.')'))
-                {
+                if ($this->mrDomainDA->execute(
+                    'INSERT INTO ' . $this->mTable . ' ' .
+                    '(id,ownerid' . $keys . ') ' .
+                    'VALUES (' . $item_id . ',' .
+                    $userId .
+                    $values . ')')
+                ) {
                     $result = $item_id;
                 }
             }
@@ -78,9 +80,7 @@ class InnoworkTaskBoard extends InnoworkItem
         return $result;
     }
 
-    public function doEdit(
-        $params
-        )
+    public function doEdit($params)
     {
         $result = false;
 
@@ -90,33 +90,41 @@ class InnoworkTaskBoard extends InnoworkItem
                 $update_str = '';
 
                 if (isset($params['done'])) {
-                    if ($params['done'] == 'true') $params['done'] = $this->mrDomainDA->fmttrue;
-                    else $params['done'] = $this->mrDomainDA->fmtfalse;
+                    if ($params['done'] == 'true') {
+                        $params['done'] = $this->mrDomainDA->fmttrue;
+                    } else {
+                        $params['done'] = $this->mrDomainDA->fmtfalse;
+                    }
                 }
 
                 while (list($field, $value) = each($params)) {
                     if ($field != 'id') {
                         switch ($field) {
-                        case 'title':
-                        case 'done':
-                        case 'trashed':
-                            if (!$start) $update_str .= ',';
-                            $update_str .= $field.'='.$this->mrDomainDA->formatText($value);
-                            $start = 0;
-                            break;
+                            case 'title':
+                            case 'done':
+                            case 'trashed':
+                                if (!$start) {
+                                    $update_str .= ',';
+                                }
+                                $update_str .= $field . '=' . $this->mrDomainDA->formatText($value);
+                                $start = 0;
+                                break;
 
-                        default:
-                            break;
+                            default:
+                                break;
                         }
                     }
                 }
 
-                $query = &$this->mrDomainDA->Execute(
-                    'UPDATE '.$this->mTable.' '.
-                    'SET '.$update_str.' '.
-                    'WHERE id='.$this->mItemId);
+                $query = $this->mrDomainDA->execute(
+                    'UPDATE ' . $this->mTable . ' ' .
+                    'SET ' . $update_str . ' ' .
+                    'WHERE id=' . $this->mItemId
+                    );
 
-                if ($query) $result = true;
+                if ($query) {
+                    $result = true;
+                }
             }
         }
 
@@ -128,16 +136,14 @@ class InnoworkTaskBoard extends InnoworkItem
         return true;
     }
 
-    public function doRemove(
-        $userId
-        )
+    public function doRemove($userId)
     {
         $result = false;
 
-        $result = $this->mrDomainDA->Execute(
-            'DELETE FROM '.$this->mTable.' '.
-            'WHERE id='.$this->mItemId
-           );
+        $result = $this->mrDomainDA->execute(
+            'DELETE FROM ' . $this->mTable . ' ' .
+            'WHERE id=' . $this->mItemId
+        );
 
         return $result;
     }
@@ -147,21 +153,21 @@ class InnoworkTaskBoard extends InnoworkItem
         $iterationQuery = $this->mrDomainDA->execute(
             'SELECT id
             FROM innowork_iterations
-            WHERE taskboardid='.$this->mItemId.'
-            AND done='.$this->mrDomainDA->formatText($this->mrDomainDA->fmtfalse));
+            WHERE taskboardid=' . $this->mItemId . '
+            AND done=' . $this->mrDomainDA->formatText($this->mrDomainDA->fmtfalse));
 
         if ($iterationQuery->getNumberRows() == 0) {
             $iterationId = $this->mrDomainDA->getNextSequenceValue('innowork_iterations_id_seq');
             $this->mrDomainDA->execute(
-                'INSERT INTO innowork_iterations
+                    'INSERT INTO innowork_iterations
                 (id, done, startdate, enddate, taskboardid)
-                VALUES ('.
-                $iterationId.','.
-                $this->mrDomainDA->formatText($this->mrDomainDA->fmtfalse).','.
-                $this->mrDomainDA->formatText('').','.
-                $this->mrDomainDA->formatText('').','.
-                $this->mItemId.
-                ')');
+                VALUES (' .
+                    $iterationId . ',' .
+                    $this->mrDomainDA->formatText($this->mrDomainDA->fmtfalse) . ',' .
+                    $this->mrDomainDA->formatText('') . ',' .
+                    $this->mrDomainDA->formatText('') . ',' .
+                    $this->mItemId .
+                    ')');
 
             return $iterationId;
         } else {
@@ -171,12 +177,15 @@ class InnoworkTaskBoard extends InnoworkItem
 
     public function addTaskToCurrentIteration($taskType, $taskId)
     {
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
         $iterationId = $this->getCurrentIterationId();
 
-        $innoworkCore = InnoworkCore::instance('innoworkcore',
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+        $innoworkCore = InnoworkCore::instance(
+            'innoworkcore',
+            $innomaticCore->getDataAccess(),
+            $innomaticCore->getCurrentDomain()->getDataAccess()
         );
+        
         $summaries = $innoworkCore->getSummaries();
 
         $taskClassName = $summaries[$taskType]['classname'];
@@ -185,9 +194,7 @@ class InnoworkTaskBoard extends InnoworkItem
         }
 
         $tempObject = new $taskClassName(
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
-            $taskId
+                $innomaticCore->getDataAccess(), $innomaticCore->getCurrentDomain()->getDataAccess(), $taskId
         );
 
         $tempObject->edit(array('iterationid' => $iterationId));
@@ -195,9 +202,7 @@ class InnoworkTaskBoard extends InnoworkItem
 
     public function removeTaskFromCurrentIteration($taskType, $taskId)
     {
-        $innoworkCore = InnoworkCore::instance('innoworkcore',
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+        $innoworkCore = InnoworkCore::instance('innoworkcore', \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(), \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
         );
         $summaries = $innoworkCore->getSummaries();
 
@@ -207,15 +212,14 @@ class InnoworkTaskBoard extends InnoworkItem
         }
 
         $tempObject = new $taskClassName(
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
-            $taskId
+                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(), \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(), $taskId
         );
 
         $tempObject->edit(array('iterationid' => 0));
     }
 
     /* public setTaskStatus($taskType, $taskId, $taskStatus) {{{ */
+
     /**
      * Updates the status of the given task.
      *
@@ -235,6 +239,7 @@ class InnoworkTaskBoard extends InnoworkItem
             return false;
         }
     }
+
     /* }}} */
 
     public function doGetSummary()
@@ -242,47 +247,41 @@ class InnoworkTaskBoard extends InnoworkItem
         $result = false;
 
         $userstories = new InnoworkTaskBoard(
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
-            );
+                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(), \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+        );
         $userstories_search = $userstories->Search(
-            array(
-                'done' => \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()->fmtfalse
-                ),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId(),
-            false,
-            false,
-            10,
-            0
-            );
+                array(
+            'done' => \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()->fmtfalse
+                ), \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId(), false, false, 10, 0
+        );
 
-        $result =
-'<vertgroup>
+        $result = '<vertgroup>
   <children>';
 
         foreach ($userstories_search as $story) {
             $result .=
-'<link>
+                    '<link>
   <args>
-    <label type="encoded">'.urlencode('- '.$story['id']).'</label>
-    <link type="encoded">'.urlencode(
-        WuiEventsCall::buildEventsCallString('innoworktaskboard', array(
-                array(
-                    'view',
-                    'showtaskboard',
-                    array('id' => $story['id'])
-                )
-            ))
-       ).'</link>
+    <label type="encoded">' . urlencode('- ' . $story['id']) . '</label>
+    <link type="encoded">' . urlencode(
+                            WuiEventsCall::buildEventsCallString('innoworktaskboard', array(
+                                array(
+                                    'view',
+                                    'showtaskboard',
+                                    array('id' => $story['id'])
+                                )
+                            ))
+                    ) . '</link>
     <compact>true</compact>
   </args>
 </link>';
         }
 
         $result .=
-'  </children>
+                '  </children>
 </vertgroup>';
 
         return $result;
     }
+
 }
