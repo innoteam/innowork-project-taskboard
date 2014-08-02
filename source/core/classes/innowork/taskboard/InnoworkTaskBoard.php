@@ -148,6 +148,88 @@ class InnoworkTaskBoard extends InnoworkItem
         return $result;
     }
 
+    /* public getProjectsList() {{{ */
+    /**
+     * Gets a list of the taskboard projects.
+     *
+     * @access public
+     * @return array List of taskboard projects in array values.
+     */
+    public function getProjectsList()
+    {
+        $projectsQuery = $this->mrDomainDA->execute(
+            "SELECT projectid"
+            . " FROM innowork_taskboards_projects"
+            . " WHERE taskboardid={$this->mItemId}"
+            );
+
+        $projectsList = array();
+
+        while (!$projectsQuery->eof) {
+            $projectsList[] = $projectsQuery->getFields('projectid');
+            $projectsQuery->moveNext();
+        }
+
+        return $projectsList;
+    }
+    /* }}} */
+
+    /* public addProject($projectId) {{{ */
+    /**
+     * Adds a project to the taskboard.
+     *
+     * @param integer $projectId Project id
+     * @access public
+     * @return boolean
+     */
+    public function addProject($projectId)
+    {
+        $projectCheckQuery = $this->mrDomainDA->execute(
+            "SELECT projectid"
+            . " FROM innowork_taskboards_projects"
+            . " WHERE projectid=$projectId"
+            );
+
+        if ($projectCheckQuery->getNumberRows() == 0) {
+            return $this->mrDomainDA->execute(
+                "INSERT INTO innowork_taskboards_projects"
+                . " (taskboardid, projectid)"
+                . " VALUES({$this->mItemId}, $projectId)"
+                );
+        } else {
+            return true;
+        }
+    }
+    /* }}} */
+
+    /* public removeProject($projectId) {{{ */
+    /**
+     * Removes a project from the taskboard.
+     *
+     * @param integer $projectId Project id
+     * @access public
+     * @return boolean
+     */
+    public function removeProject($projectId)
+    {
+        return $this->mrDomainDA->execute(
+            "DELETE FROM innowork_taskboards_projects"
+            . " WHERE projectid=$projectId"
+            . " AND taskboardid={$this->mItemId}"
+            );
+    }
+    /* }}} */
+
+    /* public getCurrentIterationId() {{{ */
+    /**
+     * Returns the identifier of the current iteration.
+     *
+     * If no iteration has been previously started, a new iteration is started,
+     * so an iteration number is always returned.
+     *
+     * @access public
+     * @return integer Iteration id
+     */
     public function getCurrentIterationId()
     {
         $iterationQuery = $this->mrDomainDA->execute(
@@ -174,6 +256,7 @@ class InnoworkTaskBoard extends InnoworkItem
             return $iterationQuery->getFields('id');
         }
     }
+    /* }}} */
 
     public function addTaskToCurrentIteration($taskType, $taskId)
     {
@@ -185,7 +268,7 @@ class InnoworkTaskBoard extends InnoworkItem
             $innomaticCore->getDataAccess(),
             $innomaticCore->getCurrentDomain()->getDataAccess()
         );
-        
+
         $summaries = $innoworkCore->getSummaries();
 
         $taskClassName = $summaries[$taskType]['classname'];
