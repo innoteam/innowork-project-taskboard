@@ -118,7 +118,7 @@ $this->toolbars['taskboards'] = array(
         }
 
         // Archived taskboards?
-        if ($eventData['done'] == 'true') {
+        if (isset($eventData['done']) && $eventData['done'] == 'true') {
             $doneBoards = true;
             $doneFlag   = $innomaticCore->getCurrentDomain()->getDataAccess()->fmttrue;
         } else {
