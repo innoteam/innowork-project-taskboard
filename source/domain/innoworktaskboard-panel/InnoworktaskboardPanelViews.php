@@ -211,7 +211,9 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
     /**
      * New taskboard view.
      *
-     * @param array $eventData
+     * @param array $eventData WUI event data
+     *
+     * @return void
      */
     public function viewNewtaskboard(
             $eventData
@@ -332,10 +334,13 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
 </vertgroup>';
     }
 
+    /* public viewSettings($eventData) {{{ */
     /**
      * Settings view.
      *
      * @param array $eventData
+     * @access public
+     * @return void
      */
     public function viewSettings($eventData)
     {
@@ -547,6 +552,7 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
   </innoworkitemacl>
             </children></horizgroup>';
     }
+    /* }}} */
 
     /* public viewSearchproject($eventData) {{{ */
     /**
