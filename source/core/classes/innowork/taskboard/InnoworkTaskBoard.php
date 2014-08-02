@@ -5,13 +5,12 @@ require_once('innowork/core/InnoworkItem.php');
 class InnoworkTaskBoard extends InnoworkItem
 {
 
-    public $mTable = 'innowork_taskboards';
+    public $mTable         = 'innowork_taskboards';
     public $mNewDispatcher = 'view';
-    public $mNewEvent = 'newtaskboard';
-    public $mNoTrash = false;
-    public $mConvertible = false;
-
-    const ITEM_TYPE = 'taskboard';
+    public $mNewEvent      = 'newtaskboard';
+    public $mNoTrash       = false;
+    public $mConvertible   = false;
+    const ITEM_TYPE        = 'taskboard';
 
     public function __construct($rrootDb, $rdomainDA, $storyId = 0)
     {
@@ -30,6 +29,15 @@ class InnoworkTaskBoard extends InnoworkItem
         $this->mShowEvent = 'showtaskboard';
     }
 
+    /* public doCreate($params, $userId) {{{ */
+    /**
+     * Creates a new taskboard item.
+     *
+     * @param array $params Field values
+     * @param integer $userId User id
+     * @access public
+     * @return boolean
+     */
     public function doCreate($params, $userId)
     {
         $result = false;
@@ -79,6 +87,7 @@ class InnoworkTaskBoard extends InnoworkItem
 
         return $result;
     }
+    /* }}} */
 
     public function doEdit($params)
     {
