@@ -8,6 +8,9 @@ require_once('innowork/projects/InnoworkTask.php');
 require_once('innowork/projects/InnoworkTaskField.php');
 require_once('innowork/projects/InnoworkProject.php');
 
+/**
+ * Taskboard panel views.
+ */
 class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
 {
     public $pageTitle;
@@ -18,6 +21,12 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
     public $xml;
     protected $localeCatalog;
 
+    /**
+     * Observer update method.
+     *
+     * @param Observable $observable
+     * @param string $arg
+     */
     public function update($observable, $arg = '')
     {
         switch ($arg) {
@@ -30,6 +39,9 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
         }
     }
 
+    /**
+     * View begin helper.
+     */
     public function beginHelper()
     {
         $this->localeCatalog = new LocaleCatalog(
@@ -42,8 +54,8 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
         );
 
-$this->pageTitle = $this->localeCatalog->getStr('taskboard.title');
-$this->toolbars['taskboards'] = array(
+        $this->pageTitle = $this->localeCatalog->getStr('taskboard.title');
+        $this->toolbars['taskboards'] = array(
     'tasks' => array(
         'label' => $this->localeCatalog->getStr('taskboards.toolbar'),
         'themeimage' => 'listbulletleft',
@@ -77,6 +89,9 @@ $this->toolbars['taskboards'] = array(
         }
     }
 
+    /**
+     * View end helper.
+     */
     public function endHelper()
     {
         $this->wuiContainer->addChild(
@@ -103,6 +118,11 @@ $this->toolbars['taskboards'] = array(
            )));
     }
 
+    /**
+     * Default view.
+     *
+     * @param array $eventData
+     */
     public function viewDefault($eventData)
     {
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
@@ -188,12 +208,17 @@ $this->toolbars['taskboards'] = array(
         $this->xml .= '</children></vertgroup>';
     }
 
+    /**
+     * New taskboard view.
+     *
+     * @param array $eventData
+     */
     public function viewNewtaskboard(
             $eventData
     )
     {
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
-        
+
         // Check if the user has enough permissions to create taskboards
         if (!$innomaticCore->getCurrentUser()->hasPermission('add_taskboards')) {
             return $this->viewDefault();
@@ -307,6 +332,11 @@ $this->toolbars['taskboards'] = array(
 </vertgroup>';
     }
 
+    /**
+     * Settings view.
+     *
+     * @param array $eventData
+     */
     public function viewSettings($eventData)
     {
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
@@ -518,6 +548,14 @@ $this->toolbars['taskboards'] = array(
             </children></horizgroup>';
     }
 
+    /* public viewSearchproject($eventData) {{{ */
+    /**
+     * Search project view.
+     *
+     * @param array $eventData
+     * @access public
+     * @return string json
+     */
     public function viewSearchproject($eventData)
     {
         $domain_da = InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess();
@@ -533,13 +571,5 @@ $this->toolbars['taskboards'] = array(
         echo json_encode($content);
         InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->halt();
     }
-}
-
-function tasks_list_action_builder($pageNumber)
-{
-	return \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString('', array(array(
-			'view',
-			'default',
-			array('pagenumber' => $pageNumber)
-	)));
+    /* }}} */
 }

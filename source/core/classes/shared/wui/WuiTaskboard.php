@@ -3,8 +3,17 @@ namespace Shared\Wui;
 
 class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 {
+    /**
+     * This widget uses the WUI session.
+     *
+     * @var bool
+     * @access public
+     */
     public $mUseSession = 'true';
 
+    /**
+     * Widget constructor
+     */
     public function __construct (
         $elemName,
         $elemArgs = '',
@@ -23,6 +32,13 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         }
     }
 
+    /* protected generateSource() {{{ */
+    /**
+     * Generates widget HTML source.
+     *
+     * @access protected
+     * @return void
+     */
     protected function generateSource()
     {
         $projectsQuery = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()->execute(
@@ -313,7 +329,18 @@ $this->mLayout .= '
 
         return true;
     }
+    /* }}} */
 
+    /* public ajaxAddToTaskboard($taskBoardId, $card) {{{ */
+    /**
+     * Ajax call to add a card to the task board.
+     *
+     * @param integer $taskBoardId Destination taskboard id
+     * @param string $card Card string in the "<tasktype>-<taskid>" format
+     * @static
+     * @access public
+     * @return XajaxResponse
+     */
     public static function ajaxAddToTaskboard($taskBoardId, $card)
     {
         $objResponse = new XajaxResponse();
@@ -333,7 +360,18 @@ $this->mLayout .= '
 
         return $objResponse;
     }
+    /* }}} */
 
+    /* public ajaxBackToBacklog($taskBoardId, $card) {{{ */
+    /**
+     * Ajax call to send a taskboard card back to the backlog.
+     *
+     * @param integer $taskBoardId
+     * @param string $card Card in the "card-<tasktype>-<taskid>" format
+     * @static
+     * @access public
+     * @return XajaxResponse
+     */
     public static function ajaxBackToBacklog($taskBoardId, $card)
     {
         $objResponse = new XajaxResponse();
@@ -354,6 +392,7 @@ $this->mLayout .= '
 
         return $objResponse;
     }
+    /* }}} */
 
     public static function ajaxUpdateTaskStatus($taskBoardId, $card, $statusId)
     {
