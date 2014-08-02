@@ -1,6 +1,11 @@
 <?php
 namespace Shared\Wui;
 
+/**
+ * Taskboard widget.
+ *
+ * @author Alex Pagnoni <alex.pagnoni@innomatic.io>
+ */
 class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 {
     /**
@@ -41,7 +46,8 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
      */
     protected function generateSource()
     {
-        $projectsQuery = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()->execute(
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
+        $projectsQuery = $innomaticCore->getCurrentDomain()->getDataAccess()->execute(
             'SELECT projectid
             FROM innowork_taskboards_projects
             WHERE taskboardid = '.$this->mArgs['taskboardid']
@@ -60,12 +66,13 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 
         $localeCatalog = new LocaleCatalog(
             'innowork-projects-taskboard::widget',
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getLanguage()
+            $innoworkCore->getCurrentUser()->getLanguage()
         );
 
-        $innoworkCore = InnoworkCore::instance('innoworkcore',
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+        $innoworkCore = InnoworkCore::instance(
+            'innoworkcore',
+            $innoworkCore->getDataAccess(),
+            $innoworkCore->getCurrentDomain()->getDataAccess()
         );
 
         $userStoriesSummaries = $innoworkCore->getSummaries('', false, array('userstory'));
@@ -78,13 +85,13 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         foreach ($userStoriesSummaries as $type => $values) {
             $userStoryClassName = $values['classname'];
             $tempObject = new $userStoryClassName(
-                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+                $innoworkCore->getDataAccess(),
+                $innoworkCore->getCurrentDomain()->getDataAccess()
             );
             foreach ($projectIdList as $projectId) {
                 $searchResults = $tempObject->search(
-                    array('projectid' => $projectId, 'done' => \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()->fmtfalse),
-                    \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId()
+                    array('projectid' => $projectId, 'done' => $innoworkCore->getCurrentDomain()->getDataAccess()->fmtfalse),
+                    $innoworkCore->getCurrentUser()->getUserId()
                 );
                 $userStoriesList = array_merge($userStoriesList, $searchResults);
             }
@@ -93,13 +100,13 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         foreach ($technicalTasksSummaries as $type => $values) {
             $taskClassName = $values['classname'];
             $tempObject = new $taskClassName(
-                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+                $innoworkCore->getDataAccess(),
+                $innoworkCore->getCurrentDomain()->getDataAccess()
             );
             foreach ($projectIdList as $projectId) {
                 $searchResults = $tempObject->search(
-                    array('projectid' => $projectId, 'done' => \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()->fmtfalse),
-                    \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId()
+                    array('projectid' => $projectId, 'done' => $innoworkCore->getCurrentDomain()->getDataAccess()->fmtfalse),
+                    $innoworkCore->getCurrentUser()->getUserId()
                 );
                 $taskList = array_merge($taskList, $searchResults);
             }
@@ -165,15 +172,15 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 <tr><td>
 <div id="backlog" style="width: 250px;">';
 
-// Backlog items (user stories, tasks, bugs)
-foreach ($backlogItems as $itemTypeId => $item) {
-    list($itemType, $itemId) = explode('-', $itemTypeId);
-    $this->mLayout .= '<div class="card '.$itemType.'" draggable="true" id="'.$itemType.'-'.$item['id'].'">'.
-       '<a href="'.InnoworkCore::getShowItemAction($itemType, $item['id']).'">'.$item['id'].'</a><br/>'.
-        $item['title'].'</div>';
-}
+        // Backlog items (user stories, tasks, bugs)
+        foreach ($backlogItems as $itemTypeId => $item) {
+            list($itemType, $itemId) = explode('-', $itemTypeId);
+            $this->mLayout .= '<div class="card '.$itemType.'" draggable="true" id="'.$itemType.'-'.$item['id'].'">'.
+               '<a href="'.InnoworkCore::getShowItemAction($itemType, $item['id']).'">'.$item['id'].'</a><br/>'.
+                $item['title'].'</div>';
+        }
 
-  $this->mLayout .= '
+        $this->mLayout .= '
 </div>
 <!--
 <p>Support Queue</p>
@@ -191,7 +198,7 @@ foreach ($backlogItems as $itemTypeId => $item) {
 <td>'.$localeCatalog->getStr('currentiteration.label').'</td>
 <td style="align: right">';
 
-    $buttonsXml = '<horizgroup><args><width>0%</width><groupalign>right</groupalign></args><children>            <button>
+        $buttonsXml = '<horizgroup><args><width>0%</width><groupalign>right</groupalign></args><children>            <button>
               <args>
                 <themeimage>cycle</themeimage>
                 <label>'.$localeCatalog->getstr('refreshboard_button').'</label>
@@ -207,8 +214,8 @@ foreach ($backlogItems as $itemTypeId => $item) {
             </button>
             ';
 
-    if (\Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->hasPermission('add_taskboards')) {
-        $buttonsXml .= '<button>
+        if ($innoworkCore->getCurrentUser()->hasPermission('add_taskboards')) {
+            $buttonsXml .= '<button>
               <args>
                 <themeimage>settings1</themeimage>
                 <label>'.$localeCatalog->getstr('boardsettings_button').'</label>
@@ -221,94 +228,94 @@ foreach ($backlogItems as $itemTypeId => $item) {
                             )).'</action>
             </args>
             </button>';
-    }
+        }
 
-$buttonsXml .= '</children></horizgroup>';
+        $buttonsXml .= '</children></horizgroup>';
 
-$this->mLayout .= WuiXml::getContentFromXml('', $buttonsXml);
-$this->mLayout .= '
+        $this->mLayout .= WuiXml::getContentFromXml('', $buttonsXml);
+        $this->mLayout .= '
 </td>
 </tr>
 </table>
 
     <div id="taskboardDiv">';
 
-    //<table id="taskboardtable" style="width: 100%; vertical-align: top;" border="1">
+        //<table id="taskboardtable" style="width: 100%; vertical-align: top;" border="1">
         //<tr><td style="text-align: center; width: 0%;">Story</td>';
 
-$cellWidth = 100 / count($taskStatusList);
+        $cellWidth = 100 / count($taskStatusList);
 
-$this->mLayout .= '<table id="taskboardtable"' . ' border="0" cellspacing="2" cellpadding="1" width="100%" style="width: 100%; vertical-align: top; margin: 1px;"' . "><tr><td bgcolor=\"" . $this->mThemeHandler->mColorsSet['tables']['gridcolor'] . "\">\n";
-$this->mLayout .= '<table border="0" width="100%" cellspacing="1" cellpadding="3" bgcolor="' . $this->mThemeHandler->mColorsSet['tables']['bgcolor'] . "\">\n";
-$this->mLayout .= "<tr>\n";
+        $this->mLayout .= '<table id="taskboardtable"' . ' border="0" cellspacing="2" cellpadding="1" width="100%" style="width: 100%; vertical-align: top; margin: 1px;"' . "><tr><td bgcolor=\"" . $this->mThemeHandler->mColorsSet['tables']['gridcolor'] . "\">\n";
+        $this->mLayout .= '<table border="0" width="100%" cellspacing="1" cellpadding="3" bgcolor="' . $this->mThemeHandler->mColorsSet['tables']['bgcolor'] . "\">\n";
+        $this->mLayout .= "<tr>\n";
 
-// Task Board column headers
+        // Task Board column headers
 
-$this->mLayout .= '<td valign="top" width="0%"><table cellpadding="4" cellspacing="1" width="100%"><tr>';
-$this->mLayout .= '<td></td>';
-$this->mLayout .= '<td width="100%" valign="top" align="center" nowrap style="white-space: nowrap" bgcolor="' . $this->mThemeHandler->mColorsSet['tables']['headerbgcolor'] . '">' .
-$localeCatalog->getStr('user_story_header') . "</td>\n";
-$this->mLayout .= '</tr></table></td>';
+        $this->mLayout .= '<td valign="top" width="0%"><table cellpadding="4" cellspacing="1" width="100%"><tr>';
+        $this->mLayout .= '<td></td>';
+        $this->mLayout .= '<td width="100%" valign="top" align="center" nowrap style="white-space: nowrap" bgcolor="' . $this->mThemeHandler->mColorsSet['tables']['headerbgcolor'] . '">' .
+        $localeCatalog->getStr('user_story_header') . "</td>\n";
+        $this->mLayout .= '</tr></table></td>';
 
-foreach ($taskStatusList as $id => $status) {
-    $this->mLayout .= '<td valign="top" width="'.$cellWidth.'%"><table cellpadding="4" cellspacing="1" width="100%"><tr>';
-    $this->mLayout .= '<td></td>';
-    $this->mLayout .= '<td width="100%" valign="top" align="center" bgcolor="' . $this->mThemeHandler->mColorsSet['tables']['headerbgcolor'] . '">' .
-    $status . "</td>\n";
-    $this->mLayout .= '</tr></table></td>';
-}
-
-$this->mLayout .= "</tr>\n";
-
-// User stories and related tasks
-
-$storyCounter = 0;
-foreach ($iterationUserStories as $userStory) {
-    $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
-    $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="background-color: white; width: 0%;">
-        <div id="card-userstory-'.$userStory['id'].'" class="card story">
-        <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStory['id'].'</a> - '.mb_strimwidth($userStory['title'], 0, 58, '...')."</header>
-        </div></td>\n";
-
-    // Draw task cards
-
-    foreach ($taskStatusList as $statusId => $statusLabel) {
-        $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
-        foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
-            if ($taskValues['statusid'] == $statusId) {
-                $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$taskValues['id'].'</a> - '.mb_strimwidth($taskValues['title'], 0, 58, '...').'</header></div>';
-            }
+        foreach ($taskStatusList as $id => $status) {
+            $this->mLayout .= '<td valign="top" width="'.$cellWidth.'%"><table cellpadding="4" cellspacing="1" width="100%"><tr>';
+            $this->mLayout .= '<td></td>';
+            $this->mLayout .= '<td width="100%" valign="top" align="center" bgcolor="' . $this->mThemeHandler->mColorsSet['tables']['headerbgcolor'] . '">' .
+            $status . "</td>\n";
+            $this->mLayout .= '</tr></table></td>';
         }
-        $this->mLayout .= "</td>\n";
-    }
 
-    $this->mLayout .= "</tr>\n";
-    $storyCounter++;
-}
+        $this->mLayout .= "</tr>\n";
 
-// Tasks not related to a user story
-if (count($iterationTasks) > 0) {
-    $this->mLayout .= '<tr id="taskboard-userstory-row-0">'."\n";
-    $this->mLayout .= '<td class="cell" style="background-color: white; width: 0%;"></td>'."\n";
+        // User stories and related tasks
 
-    // Draw task cards
+        $storyCounter = 0;
+        foreach ($iterationUserStories as $userStory) {
+            $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
+            $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="background-color: white; width: 0%;">
+                <div id="card-userstory-'.$userStory['id'].'" class="card story">
+                <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStory['id'].'</a> - '.mb_strimwidth($userStory['title'], 0, 58, '...')."</header>
+                </div></td>\n";
 
-    foreach ($taskStatusList as $statusId => $statusLabel) {
-        $this->mLayout .= '<td id="div-row0-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
-        foreach ($iterationTasks as $taskId => $taskValues) {
-            if ($taskValues['statusid'] == $statusId) {
-                $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header>'.$taskValues['title'].'</header></div>';
+            // Draw task cards
+
+            foreach ($taskStatusList as $statusId => $statusLabel) {
+                $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
+                foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
+                    if ($taskValues['statusid'] == $statusId) {
+                        $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$taskValues['id'].'</a> - '.mb_strimwidth($taskValues['title'], 0, 58, '...').'</header></div>';
+                    }
+                }
+                $this->mLayout .= "</td>\n";
             }
+
+            $this->mLayout .= "</tr>\n";
+            $storyCounter++;
         }
-        $this->mLayout .= "</td>\n";
-    }
 
-    $this->mLayout .= "</tr>\n";
-}
+        // Tasks not related to a user story
+        if (count($iterationTasks) > 0) {
+            $this->mLayout .= '<tr id="taskboard-userstory-row-0">'."\n";
+            $this->mLayout .= '<td class="cell" style="background-color: white; width: 0%;"></td>'."\n";
 
-$this->mLayout .= '</table></td></tr>' . "\n" . '</table>' . "\n";
+            // Draw task cards
 
-$this->mLayout .= '
+            foreach ($taskStatusList as $statusId => $statusLabel) {
+                $this->mLayout .= '<td id="div-row0-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
+                foreach ($iterationTasks as $taskId => $taskValues) {
+                    if ($taskValues['statusid'] == $statusId) {
+                        $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header>'.$taskValues['title'].'</header></div>';
+                    }
+                }
+                $this->mLayout .= "</td>\n";
+            }
+
+            $this->mLayout .= "</tr>\n";
+        }
+
+        $this->mLayout .= '</table></td></tr>' . "\n" . '</table>' . "\n";
+
+        $this->mLayout .= '
     </div>
 </td><td style="width: 200px; vertical-align: top;">
 <table>
