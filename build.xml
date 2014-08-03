@@ -38,7 +38,7 @@
 		</tar>
 	</target>
 
-	<target name="dev" depends="build">
+	<target name="dev" depends="package">
         <exec executable="scp">
             <arg value="${basedir}/build/${name}-${version}.tgz" />
             <arg value="innomatic-dev:/tmp/" />
