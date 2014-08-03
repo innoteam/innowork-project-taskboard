@@ -38,4 +38,20 @@
 		</tar>
 	</target>
 
+	<target name="dev" depends="build">
+        <exec executable="scp">
+            <arg value="${basedir}/build/${name}-${version}.tgz" />
+            <arg value="innomatic-dev:/tmp/" />
+        </exec>
+
+        <exec executable="ssh">
+            <arg value="innomatic-dev" />
+            <arg value="-C" />
+            <arg value="php" />
+            <arg value="/vagrant/dev/innomatic/core/scripts/application.php" />
+            <arg value="deploy" />
+            <arg value="/tmp/${name}-${version}.tgz" />
+        </exec>
+	</target>
+
 </project>
