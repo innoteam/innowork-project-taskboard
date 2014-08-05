@@ -364,9 +364,19 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             foreach ($taskStatusList as $statusId => $statusLabel) {
                 $this->mLayout .= '<td id="div-row0-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
                 foreach ($iterationTasks as $taskId => $taskValues) {
+                    // Assigned to label
+                    if ($taskValues['assignedto'] != 0 and $taskValues['assignedto'] != null) {
+                        $assignedToLabel = $usersList[$taskValues['assignedto']];
+                    } else {
+                        $assignedToLabel = $localeCatalog->getStr('unassigned_card');
+                    }
+
                     if ($taskValues['statusid'] == $statusId) {
                         $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
-                            '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a> - '.mb_strimwidth($taskValues['title'], 0, 50, '...').'</header></div>';
+                            '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.
+                            $technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a> - '.mb_strimwidth($taskValues['title'], 0, 50, '...').
+                            "<br/><i>$assignedToLabel</i>".
+                            '</header></div>';
                     }
                 }
                 $this->mLayout .= "</td>\n";
