@@ -49,6 +49,12 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         // InnomaticCore
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
 
+        // Taskboard id, mainly used in the html as id for javascript routines
+        $taskboardId = $this->mArgs['taskboardid'];
+
+        // Taskboard object
+        $taskboard = InnoworkCore::getItem('taskboard', $taskboardId);
+
         // Users list
         $usersQuery = $innomaticCore->getCurrentDomain()->getDataAccess()->execute("SELECT id,fname,lname FROM domain_users");
         $usersList = array();
@@ -59,24 +65,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         $usersQuery->free();
 
         // Taskboard projects list
-        $projectsQuery = $innomaticCore->getCurrentDomain()->getDataAccess()->execute(
-            'SELECT projectid
-            FROM innowork_taskboards_projects
-            WHERE taskboardid = '.$this->mArgs['taskboardid']
-        );
-
-        $projectIdList = array();
-
-        if ($projectsQuery->getNumberRows() > 0) {
-            while (!$projectsQuery->eof) {
-                $projectIdList[] = $projectsQuery->getFields('projectid');
-                $projectsQuery->moveNext();
-            }
-        }
-        $projectsQuery->free();
-
-        // Taskboard id, mainly used in the html as id for javascript routines
-        $taskboardId = $this->mArgs['taskboardid'];
+        $projectIdList = $taskboard->getProjectsList();
 
         // Widget locale catalog
         $localeCatalog = new LocaleCatalog(
@@ -440,13 +429,8 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
     public static function ajaxAddToTaskboard($taskBoardId, $card)
     {
         $objResponse = new XajaxResponse();
+        $taskboard = InnoworkCore::getItem('taskboard', $taskBoardId);
 
-        require_once('innowork/taskboard/InnoworkTaskBoard.php');
-        $taskboard = new InnoworkTaskBoard(
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
-            $taskBoardId
-        );
         list($taskType, $taskId) = explode('-', $card);
         $taskboard->addTaskToCurrentIteration($taskType, $taskId);
 
@@ -471,13 +455,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
     public static function ajaxBackToBacklog($taskBoardId, $card)
     {
         $objResponse = new XajaxResponse();
-
-        require_once('innowork/taskboard/InnoworkTaskBoard.php');
-        $taskboard = new InnoworkTaskBoard(
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
-            $taskBoardId
-        );
+        $taskboard = InnoworkCore::getItem('taskboard', $taskBoardId);
 
         list($cardName, $taskType, $taskId) = explode('-', $card);
         $taskboard->removeTaskFromCurrentIteration($taskType, $taskId);
@@ -504,13 +482,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
     public static function ajaxUpdateTaskStatus($taskBoardId, $card, $statusId)
     {
         $objResponse = new XajaxResponse();
-
-        require_once('innowork/taskboard/InnoworkTaskBoard.php');
-        $taskboard = new InnoworkTaskBoard(
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
-            $taskBoardId
-        );
+        $taskboard = InnoworkCore::getItem('taskboard', $taskBoardId);
 
         list($cardName, $taskType, $taskId) = explode('-', $card);
         $taskboard->setTaskStatus($taskType, $taskId, $statusId);

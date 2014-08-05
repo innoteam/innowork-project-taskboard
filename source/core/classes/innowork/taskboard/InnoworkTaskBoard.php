@@ -178,6 +178,7 @@ class InnoworkTaskBoard extends InnoworkItem
             $projectsList[] = $projectsQuery->getFields('projectid');
             $projectsQuery->moveNext();
         }
+        $projectsQuery->free();
 
         return $projectsList;
     }
