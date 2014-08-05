@@ -362,7 +362,7 @@ class InnoworkTaskBoard extends InnoworkItem
 
         $userStoriesList = array();
         $taskList = array();
-        $userStoriesTasksList = array();
+        $board['userstoriestasklist'] = array();
 
         // Build user story list
         foreach ($userStoriesSummaries as $type => $values) {
@@ -399,67 +399,56 @@ class InnoworkTaskBoard extends InnoworkItem
         // Build user stories task list
         foreach ($taskList as $id => $values) {
             if (strlen($values['userstoryid']) && $values['userstoryid'] != 0) {
-                $userStoriesTasksList[$values['userstoryid']][$id] = $values;
+                $board['userstoriestasklist'][$values['userstoryid']][$id] = $values;
                 // Remove this task from the tasks list
                 unset($taskList[$id]);
             }
         }
 
-        $board['userstoriestasklist'] = $userStoriesTasksList;
-
         // Backlog and iteration tasks
         $backlogTasks = array();
-        $iterationTasks = array();
+        $board['iterationtasks'] = array();
 
         foreach ($taskList as $id => $values) {
             if (!(strlen($values['iterationid']) > 0 && $values['iterationid'] != 0)) {
                 $backlogTasks['task-'.$id] = $values;
             } else {
-                $iterationTasks[$id] = $values;
+                $board['iterationtasks'][$id] = $values;
             }
         }
 
-        $board['iterationtasks'] = $iterationTasks;
-
         // Backlog and iteration user stories
         $backlogUserStories = array();
-        $iterationUserStories = array();
+        $board['iterationuserstories'] = array();
 
         // This keeps track of whole product backlog story points
-        $backlogStoryPoints = 0;
+        $board['backlogstorypoints'] = 0;
 
         // This keeps track of whole iteration story points
-        $iterationStoryPoints = 0;
+        $board['iterationstorypoints'] = 0;
 
         foreach ($userStoriesList as $id => $values) {
             if (!(strlen($values['iterationid']) > 0 && $values['iterationid'] != 0)) {
                 $backlogUserStories['userstory-'.$id] = $values;
                 // Add user story points to the backlog story points total
-                $backlogStoryPoints += $values['storypoints'];
+                $board['backlogstorypoints'] += $values['storypoints'];
             } else {
-                $iterationUserStories[$id] = $values;
+                $board['iterationuserstories'][$id] = $values;
                 // Add user story points to the iteration story points total
-                $iterationStoryPoints += $values['storypoints'];
+                $board['iterationstorypoints'] += $values['storypoints'];
             }
         }
 
-        if (!($iterationStoryPoints > 0)) {
-            $iterationStoryPoints = 0;
+        if (!($board['iterationstorypoints'] > 0)) {
+            $board['iterationstorypoints'] = 0;
         }
 
-        if (!($backlogStoryPoints > 0)) {
-            $backlogStoryPoints = 0;
+        if (!($board['backlogstorypoints'] > 0)) {
+            $board['backlogstorypoints'] = 0;
         }
-
-        $board['backlogstorypoints']   = $backlogStoryPoints;
-        $board['iterationstorypoints'] = $iterationStoryPoints;
-
-        $board['iterationuserstories'] = $iterationUserStories;
 
         // Merge backlog items
-        $backlogItems = array_merge($backlogUserStories, $backlogTasks);
-
-        $board['backlogitems'] = $backlogItems;
+        $board['backlogitems'] = array_merge($backlogUserStories, $backlogTasks);
 
         // Task statuses
         $board['taskstatuslist'] = InnoworkTaskField::getFields(InnoworkTaskField::TYPE_STATUS);
