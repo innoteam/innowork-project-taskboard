@@ -290,21 +290,21 @@ function handleTaskboardDragEnd(e) {
 
 var backlogCards = document.querySelectorAll('#backlog .card');
 [].forEach.call(backlogCards, function(col) {
-  col.setAttribute('draggable', 'true');  // Enable backlog cards to be draggable.
-  col.addEventListener('dragstart', handleBacklogDragStart, false);
+    col.setAttribute('draggable', 'true');  // Enable backlog cards to be draggable.
+    col.addEventListener('dragstart', handleBacklogDragStart, false);
 });
 
 var userstoryCards = document.querySelectorAll('#taskboard .card.story');
 [].forEach.call(userstoryCards, function(col) {
-  col.setAttribute('draggable', 'true');  // Enable backlog cards to be draggable.
-  col.addEventListener('dragstart', handleUserStoryDragStart, false);
+    col.setAttribute('draggable', 'true');  // Enable backlog cards to be draggable.
+    col.addEventListener('dragstart', handleUserStoryDragStart, false);
 });
 
 var taskboardCells = document.querySelectorAll('#taskboard .cell.task');
 
 var taskboardCards = document.querySelectorAll('#taskboard .card.task');
 [].forEach.call(taskboardCards, function(col) {
-  col.setAttribute('draggable', 'true');  // Enable taskboard cards to be draggable.
-  col.addEventListener('dragstart', handleTaskboardDragStart, false);
+    col.setAttribute('draggable', 'true');  // Enable taskboard cards to be draggable.
+    col.addEventListener('dragstart', handleTaskboardDragStart, false);
 });
 
