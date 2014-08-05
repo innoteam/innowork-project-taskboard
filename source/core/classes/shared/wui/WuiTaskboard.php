@@ -47,11 +47,6 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
     protected function generateSource()
     {
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
-        $projectsQuery = $innomaticCore->getCurrentDomain()->getDataAccess()->execute(
-            'SELECT projectid
-            FROM innowork_taskboards_projects
-            WHERE taskboardid = '.$this->mArgs['taskboardid']
-        );
 
         // Users list
         $usersQuery = $innomaticCore->getCurrentDomain()->getDataAccess()->execute("SELECT id,fname,lname FROM domain_users");
@@ -62,6 +57,13 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         }
         $usersQuery->free();
 
+        // Taskboard projects list
+        $projectsQuery = $innomaticCore->getCurrentDomain()->getDataAccess()->execute(
+            'SELECT projectid
+            FROM innowork_taskboards_projects
+            WHERE taskboardid = '.$this->mArgs['taskboardid']
+        );
+
         $projectIdList = array();
 
         if ($projectsQuery->getNumberRows() > 0) {
@@ -70,6 +72,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
                 $projectsQuery->moveNext();
             }
         }
+        $projectsQuery->free();
 
         $taskboardId = $this->mArgs['taskboardid'];
 
@@ -84,14 +87,20 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             $innomaticCore->getCurrentDomain()->getDataAccess()
         );
 
+        // Get innowork summaries
         $summaries               = $innoworkCore->getSummaries();
+
+        // Get summaries for user stories item types
         $userStoriesSummaries    = $innoworkCore->getSummaries('', false, array('userstory'));
+
+        // Get summaries for technical tasks item types
         $technicalTasksSummaries = $innoworkCore->getSummaries('', false, array('technicaltask'));
 
         $userStoriesList = array();
         $taskList = array();
         $userStoriesTasksList = array();
 
+        // Build user story list
         foreach ($userStoriesSummaries as $type => $values) {
             $userStoryClassName = $values['classname'];
             $tempObject = new $userStoryClassName(
@@ -107,6 +116,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             }
         }
 
+        // Build technical task list
         foreach ($technicalTasksSummaries as $type => $values) {
             $taskClassName = $values['classname'];
             $tempObject = new $taskClassName(
