@@ -6,39 +6,39 @@ var taskboardId = document.getElementById('taskboardid').value;
 // ----------------------------------------------------------------------------
 
 function handleBacklogDragStart(e) {
-  this.style.opacity = '0.4';  // this / e.target is the source node.
-  dragSrcEl = this;
+    this.style.opacity = '0.4';  // this / e.target is the source node.
+    dragSrcEl = this;
 
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/html', this.innerHTML);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', this.innerHTML);
 
     [].forEach.call(backlogCards, function(col) {
-      col.addEventListener('dragenter', handleBacklogDragEnter, false);
-      col.addEventListener('dragover', handleBacklogDragOver, false);
-      col.addEventListener('dragleave', handleBacklogDragLeave, false);
-      col.addEventListener('drop', handleBacklogDrop, false);
-      col.addEventListener('dragend', handleBacklogDragEnd, false);
+        col.addEventListener('dragenter', handleBacklogDragEnter, false);
+        col.addEventListener('dragover', handleBacklogDragOver, false);
+        col.addEventListener('dragleave', handleBacklogDragLeave, false);
+        col.addEventListener('drop', handleBacklogDrop, false);
+        col.addEventListener('dragend', handleBacklogDragEnd, false);
     });
 
-  taskboard = document.getElementById('taskboardtable');
-  taskboard.addEventListener('drop', handleToTaskboardDrop, false);
-  taskboard.addEventListener('dragover', handleToTaskboardDragOver, false);
-  taskboard.addEventListener('dragenter', handleToTaskboardDragEnter, false);
-  taskboard.addEventListener('dragleave', handleToTaskboardDragLeave, false);
-  //taskboard.style.background = '#f1f1f1';
-  taskboard.classList.add('taskboardtarget');
+    taskboard = document.getElementById('taskboardtable');
+    taskboard.addEventListener('drop', handleToTaskboardDrop, false);
+    taskboard.addEventListener('dragover', handleToTaskboardDragOver, false);
+    taskboard.addEventListener('dragenter', handleToTaskboardDragEnter, false);
+    taskboard.addEventListener('dragleave', handleToTaskboardDragLeave, false);
+    //taskboard.style.background = '#f1f1f1';
+    taskboard.classList.add('taskboardtarget');
 }
 
 function handleToTaskboardDragOver(e) {
     this.classList.remove('taskboardtarget');
     this.classList.add('taskboardover');
-  if (e.preventDefault) {
-    e.preventDefault(); // Necessary. Allows us to drop.
-  }
+    if (e.preventDefault) {
+        e.preventDefault(); // Necessary. Allows us to drop.
+    }
 
-  e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
 
-  return false;
+    return false;
 }
 
 function handleToTaskboardDragEnter(e) {
@@ -57,17 +57,17 @@ function handleToTaskboardDrop(ev) {
 }
 
 function handleBacklogDragOver(e) {
-  if (e.preventDefault) {
-    e.preventDefault(); // Necessary. Allows us to drop.
-  }
+    if (e.preventDefault) {
+        e.preventDefault(); // Necessary. Allows us to drop.
+    }
 
-  e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
 
-  return false;
+    return false;
 }
 
 function handleBacklogDragEnter(e) {
-  // this / e.target is the current hover target.
+    // this / e.target is the current hover target.
     if (this.parentNode.id == dragSrcEl.parentNode.id) {
         this.classList.add('over');
     }
@@ -78,44 +78,44 @@ function handleBacklogDragLeave(e) {
 }
 
 function handleBacklogDrop(e) {
-  // this / e.target is current target element.
+    // this / e.target is current target element.
 
-  if (e.stopPropagation) {
-    e.stopPropagation(); // stops the browser from redirecting.
-  }
-  // Don't do anything if dropping the same card we're dragging.
-  if (dragSrcEl != this && this.parentNode.id == dragSrcEl.parentNode.id) {
-    // Set the source card's HTML to the HTML of the card we dropped on.
-    dragSrcEl.innerHTML = this.innerHTML;
-    this.innerHTML = e.dataTransfer.getData('text/html');
-  }
+    if (e.stopPropagation) {
+        e.stopPropagation(); // stops the browser from redirecting.
+    }
+    // Don't do anything if dropping the same card we're dragging.
+    if (dragSrcEl != this && this.parentNode.id == dragSrcEl.parentNode.id) {
+        // Set the source card's HTML to the HTML of the card we dropped on.
+        dragSrcEl.innerHTML = this.innerHTML;
+        this.innerHTML = e.dataTransfer.getData('text/html');
+    }
 
-  return false;
+    return false;
 }
 
 function handleBacklogDragEnd(e) {
-  // this/e.target is the source node.
-  this.style.opacity = '1';
+    // this/e.target is the source node.
+    this.style.opacity = '1';
 
     [].forEach.call(backlogCards, function(col) {
-      col.removeEventListener('dragenter', handleBacklogDragEnter, false);
-      col.removeEventListener('dragover', handleBacklogDragOver, false);
-      col.removeEventListener('dragleave', handleBacklogDragLeave, false);
-      col.removeEventListener('drop', handleBacklogDrop, false);
-      col.removeEventListener('dragend', handleBacklogDragEnd, false);
+        col.removeEventListener('dragenter', handleBacklogDragEnter, false);
+        col.removeEventListener('dragover', handleBacklogDragOver, false);
+        col.removeEventListener('dragleave', handleBacklogDragLeave, false);
+        col.removeEventListener('drop', handleBacklogDrop, false);
+        col.removeEventListener('dragend', handleBacklogDragEnd, false);
     });
 
-  taskboard = document.getElementById('taskboardtable');
-  taskboard.classList.remove('taskboardtarget');
+    taskboard = document.getElementById('taskboardtable');
+    taskboard.classList.remove('taskboardtarget');
     taskboard.classList.remove('taskboardover');
-  taskboard.removeEventListener('drop', handleToTaskboardDrop, false);
-  taskboard.removeEventListener('dragover', handleToTaskboardDragOver, false);
-  taskboard.removeEventListener('dragenter', handleToTaskboardDragEnter, false);
-  taskboard.removeEventListener('dragleave', handleToTaskboardDragLeave, false);
+    taskboard.removeEventListener('drop', handleToTaskboardDrop, false);
+    taskboard.removeEventListener('dragover', handleToTaskboardDragOver, false);
+    taskboard.removeEventListener('dragenter', handleToTaskboardDragEnter, false);
+    taskboard.removeEventListener('dragleave', handleToTaskboardDragLeave, false);
 
-  [].forEach.call(backlogCards, function (col) {
-    col.classList.remove('over');
-  });
+    [].forEach.call(backlogCards, function (col) {
+        col.classList.remove('over');
+    });
 }
 
 // ----------------------------------------------------------------------------
@@ -123,39 +123,39 @@ function handleBacklogDragEnd(e) {
 // ----------------------------------------------------------------------------
 
 function handleUserStoryDragStart(e) {
-  this.style.opacity = '0.4';  // this / e.target is the source node.
-  dragSrcEl = this;
+    this.style.opacity = '0.4';  // this / e.target is the source node.
+    dragSrcEl = this;
 
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/html', this.innerHTML);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', this.innerHTML);
 
-  taskboard = document.getElementById('backlogtable');
-  taskboard.addEventListener('drop', handleToBacklogDrop, false);
-  taskboard.addEventListener('dragover', handleToBacklogDragOver, false);
-  taskboard.addEventListener('dragenter', handleToBacklogDragEnter, false);
-  taskboard.addEventListener('dragleave', handleToBacklogDragLeave, false);
-  //taskboard.style.background = '#f1f1f1';
-  taskboard.classList.add('backlogtarget');
+    taskboard = document.getElementById('backlogtable');
+    taskboard.addEventListener('drop', handleToBacklogDrop, false);
+    taskboard.addEventListener('dragover', handleToBacklogDragOver, false);
+    taskboard.addEventListener('dragenter', handleToBacklogDragEnter, false);
+    taskboard.addEventListener('dragleave', handleToBacklogDragLeave, false);
+    //taskboard.style.background = '#f1f1f1';
+    taskboard.classList.add('backlogtarget');
 
     [].forEach.call(userstoryCards, function(col) {
-      col.addEventListener('dragenter', handleUserStoryDragEnter, false);
-      col.addEventListener('dragover', handleUserStoryDragOver, false);
-      col.addEventListener('dragleave', handleUserStoryDragLeave, false);
-      col.addEventListener('drop', handleUserStoryDrop, false);
-      col.addEventListener('dragend', handleUserStoryDragEnd, false);
+        col.addEventListener('dragenter', handleUserStoryDragEnter, false);
+        col.addEventListener('dragover', handleUserStoryDragOver, false);
+        col.addEventListener('dragleave', handleUserStoryDragLeave, false);
+        col.addEventListener('drop', handleUserStoryDrop, false);
+        col.addEventListener('dragend', handleUserStoryDragEnd, false);
     });
 }
 
 function handleToBacklogDragOver(e) {
     this.classList.remove('backlogtarget');
     this.classList.add('backlogover');
-  if (e.preventDefault) {
-    e.preventDefault(); // Necessary. Allows us to drop.
-  }
+    if (e.preventDefault) {
+        e.preventDefault(); // Necessary. Allows us to drop.
+    }
 
-  e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
 
-  return false;
+    return false;
 }
 
 function handleToBacklogDragEnter(e) {
@@ -174,20 +174,20 @@ function handleToBacklogDrop(ev) {
 }
 
 function handleUserStoryDragOver(e) {
-  if (e.preventDefault) {
-    e.preventDefault(); // Necessary. Allows us to drop.
-  }
+    if (e.preventDefault) {
+        e.preventDefault(); // Necessary. Allows us to drop.
+    }
 
-  e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
 
-  return false;
+    return false;
 }
 
 function handleUserStoryDragEnter(e) {
-  // this / e.target is the current hover target.
+    // this / e.target is the current hover target.
     if (this.parentNode.class == dragSrcEl.parentNode.class) {
         this.classList.add('over');
-   }
+    }
 }
 
 function handleUserStoryDragLeave(e) {
@@ -195,42 +195,42 @@ function handleUserStoryDragLeave(e) {
 }
 
 function handleUserStoryDrop(e) {
-  // this / e.target is current target element.
+    // this / e.target is current target element.
 
-  if (e.stopPropagation) {
-    e.stopPropagation(); // stops the browser from redirecting.
-  }
-  // Don't do anything if dropping the same card we're dragging.
+    if (e.stopPropagation) {
+        e.stopPropagation(); // stops the browser from redirecting.
+    }
+    // Don't do anything if dropping the same card we're dragging.
     //&& this.parentNode.id == dragSrcEl.parentNode.id
-  if (dragSrcEl != this ) {
-    // Set the source card's HTML to the HTML of the card we dropped on.
-    dragSrcEl.innerHTML = this.innerHTML;
-    this.innerHTML = e.dataTransfer.getData('text/html');
-  }
+    if (dragSrcEl != this ) {
+        // Set the source card's HTML to the HTML of the card we dropped on.
+        dragSrcEl.innerHTML = this.innerHTML;
+        this.innerHTML = e.dataTransfer.getData('text/html');
+    }
 
-  return false;
+    return false;
 }
 
 function handleUserStoryDragEnd(e) {
-  // this/e.target is the source node.
-  this.style.opacity = '1';
+    // this/e.target is the source node.
+    this.style.opacity = '1';
 
-  taskboard = document.getElementById('backlogtable');
-  taskboard.classList.remove('backlogtarget');
+    taskboard = document.getElementById('backlogtable');
+    taskboard.classList.remove('backlogtarget');
     taskboard.classList.remove('backlogover');
-  taskboard.removeEventListener('drop', handleToBacklogDrop, false);
-  taskboard.removeEventListener('dragover', handleToBacklogDragOver, false);
-  taskboard.removeEventListener('dragenter', handleToBacklogDragEnter, false);
-  taskboard.removeEventListener('dragleave', handleToBacklogDragLeave, false);
+    taskboard.removeEventListener('drop', handleToBacklogDrop, false);
+    taskboard.removeEventListener('dragover', handleToBacklogDragOver, false);
+    taskboard.removeEventListener('dragenter', handleToBacklogDragEnter, false);
+    taskboard.removeEventListener('dragleave', handleToBacklogDragLeave, false);
 
-  [].forEach.call(userstoryCards, function (col) {
-    col.classList.remove('over');
-      col.removeEventListener('dragenter', handleUserStoryDragEnter, false);
-      col.removeEventListener('dragover', handleUserStoryDragOver, false);
-      col.removeEventListener('dragleave', handleUserStoryDragLeave, false);
-      col.removeEventListener('drop', handleUserStoryDrop, false);
-      col.removeEventListener('dragend', handleUserStoryDragEnd, false);
-  });
+    [].forEach.call(userstoryCards, function (col) {
+        col.classList.remove('over');
+        col.removeEventListener('dragenter', handleUserStoryDragEnter, false);
+        col.removeEventListener('dragover', handleUserStoryDragOver, false);
+        col.removeEventListener('dragleave', handleUserStoryDragLeave, false);
+        col.removeEventListener('drop', handleUserStoryDrop, false);
+        col.removeEventListener('dragend', handleUserStoryDragEnd, false);
+    });
 }
 
 // ----------------------------------------------------------------------------
