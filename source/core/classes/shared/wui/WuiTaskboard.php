@@ -46,6 +46,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
      */
     protected function generateSource()
     {
+        // InnomaticCore
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
 
         // Users list
@@ -74,8 +75,10 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         }
         $projectsQuery->free();
 
+        // Taskboard id, mainly used in the html as id for javascript routines
         $taskboardId = $this->mArgs['taskboardid'];
 
+        // Widget locale catalog
         $localeCatalog = new LocaleCatalog(
             'innowork-projects-taskboard::widget',
             $innomaticCore->getCurrentUser()->getLanguage()
@@ -132,9 +135,11 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             }
         }
 
+        // Build user stories task list
         foreach ($taskList as $id => $values) {
             if (strlen($values['userstoryid']) && $values['userstoryid'] != 0) {
                 $userStoriesTasksList[$values['userstoryid']][$id] = $values;
+                // Remove this task from the tasks list
                 unset($taskList[$id]);
             }
         }
@@ -264,6 +269,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             </button>
             ';
 
+        // Add settings button if the user has enough permissions
         if ($innomaticCore->getCurrentUser()->hasPermission('add_taskboards')) {
             $buttonsXml .= '<button>
               <args>
