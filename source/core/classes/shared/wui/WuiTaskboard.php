@@ -176,9 +176,17 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         // Backlog items (user stories, tasks, bugs)
         foreach ($backlogItems as $itemTypeId => $item) {
             list($itemType, $itemId) = explode('-', $itemTypeId);
+
+            // Story points
+            if ($itemType == 'userstory' && $item['storypoints'] > 0) {
+                $storyPoints = '<br/><strong>'.$item['storypoints'].'</strong>';
+            } else {
+                $storyPoints = '';
+            }
+
             $this->mLayout .= '<div class="card '.$itemType.'" draggable="true" id="'.$itemType.'-'.$item['id'].'">'.
                '<a href="'.InnoworkCore::getShowItemAction($itemType, $item['id']).'">'.$summaries[$itemType]['label'].' '.$item['id'].'</a><br/>'.
-                $item['title'].'</div>';
+                $item['title'].$storyPoints.'</div>';
         }
 
         $this->mLayout .= '
@@ -272,17 +280,30 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 
         $storyCounter = 0;
         foreach ($iterationUserStories as $userStory) {
+            // Story points
+            if ($userStory['storypoints'] > 0) {
+                $storyPoints = '<strong>'.$userStory['storypoints'].'</strong>';
+            } else {
+                $storyPoints = '';
+            }
+
             $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
             $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="background-color: white; width: 0%;">
                 <div id="card-userstory-'.$userStory['id'].'" class="card story">
-                <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStoriesSummaries['userstory']['label'].' '.$userStory['id'].'</a><br/>'.mb_strimwidth($userStory['title'], 0, 50, '...')."</header>
-                </div></td>\n";
+                <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStoriesSummaries['userstory']['label'].' '.$userStory['id'].'</a><br/>'.mb_strimwidth($userStory['title'], 0, 50, '...').
+                "<br/><br/>".
+                $storyPoints.
+                "</header>".
+                "</div></td>\n";
 
             // Draw task cards
-
             foreach ($taskStatusList as $statusId => $statusLabel) {
                 $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
                 foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
+                    if ($taskValues['id'] != 0 and $taskValues['id'] != null) {
+                        $assignedTo = '';
+                    }
+
                     if ($taskValues['statusid'] == $statusId) {
                         $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
                             '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a><br/>'.mb_strimwidth($taskValues['title'], 0, 50, '...').'</header></div>';
