@@ -155,12 +155,17 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         $backlogUserStories = array();
         $iterationUserStories = array();
 
+        // This keeps track of whole product backlog story points
+        $backlogStoryPoints = 0;
+
         // This keeps track of whole iteration story points
         $iterationStoryPoints = 0;
 
         foreach ($userStoriesList as $id => $values) {
             if (!(strlen($values['iterationid']) > 0 && $values['iterationid'] != 0)) {
                 $backlogUserStories['userstory-'.$id] = $values;
+                // Add user story points to the backlog story points total
+                $backlogStoryPoints += $values['storypoints'];
             } else {
                 $iterationUserStories[$id] = $values;
                 // Add user story points to the iteration story points total
@@ -184,6 +189,12 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 
         $this->mLayout = ($this->mComments ? '<!-- begin ' . $this->mName . ' taskboard -->' : '');
 
+        // Build the backlog story points label
+        if (!($backlogStoryPoints > 0)) {
+            $backlogStoryPoints = 0;
+        }
+        $backlogStoryPointsLabel = sprintf($localeCatalog->getStr('backlog_story_points'), $backlogStoryPoints);
+
         // Build the iteration story points label
         if (!($iterationStoryPoints > 0)) {
             $iterationStoryPoints = 0;
@@ -195,7 +206,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         <td style="width: 250px; vertical-align: top;">
 <table>
 <tr>
-<td>'.$localeCatalog->getStr('productbacklog.label').'</td>
+<td>'.$localeCatalog->getStr('productbacklog.label').' - '.$backlogStoryPointsLabel.'</td>
 </tr>
 </table>
             <div id="backlog">
