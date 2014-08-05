@@ -246,15 +246,15 @@ function handleTaskboardDragLeave(e) {
 }
 
 function handleTaskboardDragStart(e) {
-  dragSrcEl = this;
+    dragSrcEl = this;
     e.dataTransfer.setData('Text', e.target.id);
 
     [].forEach.call(taskboardCells, function(col) {
-      col.addEventListener('drop', handleTaskboardDrop, false);
-      col.addEventListener('dragover', handleTaskboardDragOver, false);
-      col.addEventListener('dragenter', handleTaskboardDragEnter, false);
-      col.addEventListener('dragleave', handleTaskboardDragLeave, false);
-      col.addEventListener('dragend', handleTaskboardDragEnd, false);
+        col.addEventListener('drop', handleTaskboardDrop, false);
+        col.addEventListener('dragover', handleTaskboardDragOver, false);
+        col.addEventListener('dragenter', handleTaskboardDragEnter, false);
+        col.addEventListener('dragleave', handleTaskboardDragLeave, false);
+        col.addEventListener('dragend', handleTaskboardDragEnd, false);
     });
 }
 
@@ -269,23 +269,23 @@ function handleTaskboardDrop(ev) {
 }
 
 function handleTaskboardDragEnter(e) {
-  // this / e.target is the current hover target.
+    // this / e.target is the current hover target.
     if (this.parentNode.id == dragSrcEl.parentNode.parentNode.id) {
         this.classList.add('over');
     }
 }
 
 function handleTaskboardDragEnd(e) {
-  // this/e.target is the source node.
-  this.style.opacity = '1';
-  [].forEach.call(taskboardCells, function (col) {
-    col.classList.remove('over');
-      col.removeEventListener('drop', handleTaskboardDrop, false);
-      col.removeEventListener('dragover', handleTaskboardDragOver, false);
-      col.removeEventListener('dragenter', handleTaskboardDragEnter, false);
-      col.removeEventListener('dragleave', handleTaskboardDragLeave, false);
-      col.removeEventListener('dragend', handleTaskboardDragEnd, false);
-  });
+    // this/e.target is the source node.
+    this.style.opacity = '1';
+    [].forEach.call(taskboardCells, function (col) {
+        col.classList.remove('over');
+        col.removeEventListener('drop', handleTaskboardDrop, false);
+        col.removeEventListener('dragover', handleTaskboardDragOver, false);
+        col.removeEventListener('dragenter', handleTaskboardDragEnter, false);
+        col.removeEventListener('dragleave', handleTaskboardDragLeave, false);
+        col.removeEventListener('dragend', handleTaskboardDragEnd, false);
+    });
 }
 
 var backlogCards = document.querySelectorAll('#backlog .card');
