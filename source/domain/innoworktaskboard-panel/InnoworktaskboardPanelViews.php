@@ -215,9 +215,7 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
      *
      * @return void
      */
-    public function viewNewtaskboard(
-            $eventData
-    )
+    public function viewNewtaskboard($eventData)
     {
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
 
