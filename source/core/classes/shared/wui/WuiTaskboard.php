@@ -136,11 +136,16 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         $backlogUserStories = array();
         $iterationUserStories = array();
 
+        // This keeps track of whole iteration story points
+        $iterationStoryPoints = 0;
+
         foreach ($userStoriesList as $id => $values) {
             if (!(strlen($values['iterationid']) > 0 && $values['iterationid'] != 0)) {
                 $backlogUserStories['userstory-'.$id] = $values;
             } else {
                 $iterationUserStories[$id] = $values;
+                // Add user story points to the iteration story points total
+                $iterationStoryPoints += $values['storypoints'];
             }
         }
 
@@ -159,6 +164,12 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
          */
 
         $this->mLayout = ($this->mComments ? '<!-- begin ' . $this->mName . ' taskboard -->' : '');
+
+        // Build the iteration story points label
+        if (!($iterationStoryPoints > 0)) {
+            $iterationStoryPoints = 0;
+        }
+        $iterationStoryPointsLabel = sprintf($localeCatalog->getStr('iteration_story_points'), $iterationStoryPoints);
 
         $this->mLayout .= '<table style="width: 100%; padding: 5px;">
     <tr>
@@ -204,7 +215,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 </td><td id="taskboard" class="taskboard" style="vertical-align: top;">
     <table style="width: 100%">
 <tr>
-<td>'.$localeCatalog->getStr('currentiteration.label').'</td>
+<td>'.$localeCatalog->getStr('currentiteration.label').' - '.$iterationStoryPointsLabel.'</td>
 <td style="align: right">';
 
         $buttonsXml = '<horizgroup><args><width>0%</width><groupalign>right</groupalign></args><children>            <button>
@@ -279,6 +290,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         // User stories and related tasks
 
         $storyCounter = 0;
+
         foreach ($iterationUserStories as $userStory) {
             // Story points
             if ($userStory['storypoints'] > 0) {
@@ -299,14 +311,16 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             // Draw task cards
             foreach ($taskStatusList as $statusId => $statusLabel) {
                 $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
-                foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
-                    if ($taskValues['id'] != 0 and $taskValues['id'] != null) {
-                        $assignedTo = '';
-                    }
+                if (isset($userStoriesTasksList[$userStory['id']])) {
+                    foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
+                        if ($taskValues['id'] != 0 and $taskValues['id'] != null) {
+                            $assignedTo = '';
+                        }
 
-                    if ($taskValues['statusid'] == $statusId) {
-                        $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
-                            '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a><br/>'.mb_strimwidth($taskValues['title'], 0, 50, '...').'</header></div>';
+                        if ($taskValues['statusid'] == $statusId) {
+                            $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
+                                '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a><br/>'.mb_strimwidth($taskValues['title'], 0, 50, '...').'</header></div>';
+                        }
                     }
                 }
                 $this->mLayout .= "</td>\n";
