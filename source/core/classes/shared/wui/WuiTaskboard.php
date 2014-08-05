@@ -66,16 +66,17 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
 
         $localeCatalog = new LocaleCatalog(
             'innowork-projects-taskboard::widget',
-            $innoworkCore->getCurrentUser()->getLanguage()
+            $innomaticCore->getCurrentUser()->getLanguage()
         );
 
         $innoworkCore = InnoworkCore::instance(
             'innoworkcore',
-            $innoworkCore->getDataAccess(),
-            $innoworkCore->getCurrentDomain()->getDataAccess()
+            $innomaticCore->getDataAccess(),
+            $innomaticCore->getCurrentDomain()->getDataAccess()
         );
 
-        $userStoriesSummaries = $innoworkCore->getSummaries('', false, array('userstory'));
+        $summaries               = $innoworkCore->getSummaries();
+        $userStoriesSummaries    = $innoworkCore->getSummaries('', false, array('userstory'));
         $technicalTasksSummaries = $innoworkCore->getSummaries('', false, array('technicaltask'));
 
         $userStoriesList = array();
@@ -85,13 +86,13 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         foreach ($userStoriesSummaries as $type => $values) {
             $userStoryClassName = $values['classname'];
             $tempObject = new $userStoryClassName(
-                $innoworkCore->getDataAccess(),
-                $innoworkCore->getCurrentDomain()->getDataAccess()
+                $innomaticCore->getDataAccess(),
+                $innomaticCore->getCurrentDomain()->getDataAccess()
             );
             foreach ($projectIdList as $projectId) {
                 $searchResults = $tempObject->search(
-                    array('projectid' => $projectId, 'done' => $innoworkCore->getCurrentDomain()->getDataAccess()->fmtfalse),
-                    $innoworkCore->getCurrentUser()->getUserId()
+                    array('projectid' => $projectId, 'done' => $innomaticCore->getCurrentDomain()->getDataAccess()->fmtfalse),
+                    $innomaticCore->getCurrentUser()->getUserId()
                 );
                 $userStoriesList = array_merge($userStoriesList, $searchResults);
             }
@@ -100,13 +101,13 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         foreach ($technicalTasksSummaries as $type => $values) {
             $taskClassName = $values['classname'];
             $tempObject = new $taskClassName(
-                $innoworkCore->getDataAccess(),
-                $innoworkCore->getCurrentDomain()->getDataAccess()
+                $innomaticCore->getDataAccess(),
+                $innomaticCore->getCurrentDomain()->getDataAccess()
             );
             foreach ($projectIdList as $projectId) {
                 $searchResults = $tempObject->search(
-                    array('projectid' => $projectId, 'done' => $innoworkCore->getCurrentDomain()->getDataAccess()->fmtfalse),
-                    $innoworkCore->getCurrentUser()->getUserId()
+                    array('projectid' => $projectId, 'done' => $innomaticCore->getCurrentDomain()->getDataAccess()->fmtfalse),
+                    $innomaticCore->getCurrentUser()->getUserId()
                 );
                 $taskList = array_merge($taskList, $searchResults);
             }
@@ -176,7 +177,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         foreach ($backlogItems as $itemTypeId => $item) {
             list($itemType, $itemId) = explode('-', $itemTypeId);
             $this->mLayout .= '<div class="card '.$itemType.'" draggable="true" id="'.$itemType.'-'.$item['id'].'">'.
-               '<a href="'.InnoworkCore::getShowItemAction($itemType, $item['id']).'">'.$item['id'].'</a><br/>'.
+               '<a href="'.InnoworkCore::getShowItemAction($itemType, $item['id']).'">'.$summaries[$itemType]['label'].' '.$item['id'].'</a><br/>'.
                 $item['title'].'</div>';
         }
 
@@ -214,7 +215,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             </button>
             ';
 
-        if ($innoworkCore->getCurrentUser()->hasPermission('add_taskboards')) {
+        if ($innomaticCore->getCurrentUser()->hasPermission('add_taskboards')) {
             $buttonsXml .= '<button>
               <args>
                 <themeimage>settings1</themeimage>
@@ -274,7 +275,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
             $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="background-color: white; width: 0%;">
                 <div id="card-userstory-'.$userStory['id'].'" class="card story">
-                <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStory['id'].'</a> - '.mb_strimwidth($userStory['title'], 0, 58, '...')."</header>
+                <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStoriesSummaries['userstory']['label'].' '.$userStory['id'].'</a><br/>'.mb_strimwidth($userStory['title'], 0, 50, '...')."</header>
                 </div></td>\n";
 
             // Draw task cards
@@ -283,7 +284,8 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
                 $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
                 foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
                     if ($taskValues['statusid'] == $statusId) {
-                        $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$taskValues['id'].'</a> - '.mb_strimwidth($taskValues['title'], 0, 58, '...').'</header></div>';
+                        $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
+                            '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a><br/>'.mb_strimwidth($taskValues['title'], 0, 50, '...').'</header></div>';
                     }
                 }
                 $this->mLayout .= "</td>\n";
@@ -299,12 +301,12 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             $this->mLayout .= '<td class="cell" style="background-color: white; width: 0%;"></td>'."\n";
 
             // Draw task cards
-
             foreach ($taskStatusList as $statusId => $statusLabel) {
                 $this->mLayout .= '<td id="div-row0-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
                 foreach ($iterationTasks as $taskId => $taskValues) {
                     if ($taskValues['statusid'] == $statusId) {
-                        $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true"><header>'.$taskValues['title'].'</header></div>';
+                        $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
+                            '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a> - '.mb_strimwidth($taskValues['title'], 0, 50, '...').'</header></div>';
                     }
                 }
                 $this->mLayout .= "</td>\n";
