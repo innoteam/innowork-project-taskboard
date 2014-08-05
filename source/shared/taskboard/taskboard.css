@@ -60,15 +60,15 @@
 
 #taskboard .card.task {
     cursor: move;
-    height: 75px;
-    width: 120px;
+    height: 95px;
+    width: 130px;
     background-color: #ffcc00;
     color: black;
     font-weight: 300;
 }
 
 #taskboard .card.story {
-    height: 90px;
+    height: 110px;
     width: 140px;
     background-color: #ff2d55;
     color: black;
