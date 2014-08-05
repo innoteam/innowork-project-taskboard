@@ -6,7 +6,7 @@ var taskboardId = document.getElementById('taskboardid').value;
 // ----------------------------------------------------------------------------
 
 function handleBacklogDragStart(e) {
-    this.style.opacity = '0.4';  // this / e.target is the source node.
+    this.style.opacity = '0.4';
     dragSrcEl = this;
 
     e.dataTransfer.effectAllowed = 'move';
@@ -33,10 +33,10 @@ function handleToTaskboardDragOver(e) {
     this.classList.remove('taskboardtarget');
     this.classList.add('taskboardover');
     if (e.preventDefault) {
-        e.preventDefault(); // Necessary. Allows us to drop.
+        e.preventDefault();
     }
 
-    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    e.dataTransfer.dropEffect = 'move';
 
     return false;
 }
@@ -58,10 +58,10 @@ function handleToTaskboardDrop(ev) {
 
 function handleBacklogDragOver(e) {
     if (e.preventDefault) {
-        e.preventDefault(); // Necessary. Allows us to drop.
+        e.preventDefault();
     }
 
-    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    e.dataTransfer.dropEffect = 'move';
 
     return false;
 }
@@ -74,7 +74,7 @@ function handleBacklogDragEnter(e) {
 }
 
 function handleBacklogDragLeave(e) {
-    this.classList.remove('over');  // this / e.target is previous target element.
+    this.classList.remove('over');
 }
 
 function handleBacklogDrop(e) {
@@ -150,10 +150,10 @@ function handleToBacklogDragOver(e) {
     this.classList.remove('backlogtarget');
     this.classList.add('backlogover');
     if (e.preventDefault) {
-        e.preventDefault(); // Necessary. Allows us to drop.
+        e.preventDefault();
     }
 
-    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    e.dataTransfer.dropEffect = 'move';
 
     return false;
 }
@@ -175,10 +175,10 @@ function handleToBacklogDrop(ev) {
 
 function handleUserStoryDragOver(e) {
     if (e.preventDefault) {
-        e.preventDefault(); // Necessary. Allows us to drop.
+        e.preventDefault();
     }
 
-    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    e.dataTransfer.dropEffect = 'move';
 
     return false;
 }
