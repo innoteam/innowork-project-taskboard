@@ -53,6 +53,15 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             WHERE taskboardid = '.$this->mArgs['taskboardid']
         );
 
+        // Users list
+        $usersQuery = $innomaticCore->getCurrentDomain()->getDataAccess()->execute("SELECT id,fname,lname FROM domain_users");
+        $usersList = array();
+        while (!$usersQuery->eof) {
+            $usersList[$usersQuery->getFields('id')] = $usersQuery->getFields('fname').' '.$usersQuery->getFields('lname');
+            $usersQuery->moveNext();
+        }
+        $usersQuery->free();
+
         $projectIdList = array();
 
         if ($projectsQuery->getNumberRows() > 0) {
@@ -313,13 +322,19 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
                 $this->mLayout .= '<td id="div-row'.$userStory['id'].'-'.$statusId.'" class="cell task"'."style=\"background-color: white; width: {$cellWidth}%;\">";
                 if (isset($userStoriesTasksList[$userStory['id']])) {
                     foreach ($userStoriesTasksList[$userStory['id']] as $taskId => $taskValues) {
-                        if ($taskValues['id'] != 0 and $taskValues['id'] != null) {
-                            $assignedTo = '';
+                        // Assigned to label
+                        if ($taskValues['assignedto'] != 0 and $taskValues['assignedto'] != null) {
+                            $assignedToLabel = $usersList[$taskValues['assignedto']];
+                        } else {
+                            $assignedToLabel = $localeCatalog->getStr('unassigned_card');
                         }
 
                         if ($taskValues['statusid'] == $statusId) {
                             $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
-                                '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.$technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a><br/>'.mb_strimwidth($taskValues['title'], 0, 50, '...').'</header></div>';
+                                '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.
+                                $technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a><br/>'.mb_strimwidth($taskValues['title'], 0, 50, '...').
+                                "<br/><i>$assignedToLabel</i>".
+                                '</header></div>';
                         }
                     }
                 }
