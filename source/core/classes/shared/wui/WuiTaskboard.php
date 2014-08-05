@@ -321,7 +321,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
             $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="background-color: white; width: 0%;">
                 <div id="card-userstory-'.$userStory['id'].'" class="card story">
-                <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStoriesSummaries['userstory']['label'].' '.$userStory['id'].'</a><br/>'.mb_strimwidth($userStory['title'], 0, 50, '...').
+                <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStoriesSummaries['userstory']['label'].' '.$userStory['id'].'</a><br/>'.mb_strimwidth($userStory['title'], 0, 70, '...').
                 "<br/><br/>".
                 $storyPoints.
                 "</header>".
