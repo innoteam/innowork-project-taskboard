@@ -249,6 +249,15 @@ function handleTaskboardDragStart(e) {
     dragSrcEl = this;
     e.dataTransfer.setData('Text', e.target.id);
 
+    if (this.parentNode.parentNode.id == 'taskboard-userstory-row-0') {
+        taskboard = document.getElementById('backlogtable');
+        taskboard.addEventListener('drop', handleToBacklogDrop, false);
+        taskboard.addEventListener('dragover', handleToBacklogDragOver, false);
+        taskboard.addEventListener('dragenter', handleToBacklogDragEnter, false);
+        taskboard.addEventListener('dragleave', handleToBacklogDragLeave, false);
+        taskboard.classList.add('backlogtarget');
+    }
+
     [].forEach.call(taskboardCells, function(col) {
         col.addEventListener('drop', handleTaskboardDrop, false);
         col.addEventListener('dragover', handleTaskboardDragOver, false);
@@ -278,6 +287,17 @@ function handleTaskboardDragEnter(e) {
 function handleTaskboardDragEnd(e) {
     // this/e.target is the source node.
     this.style.opacity = '1';
+
+    if (dragSrcEl.parentNode.parentNode.id == 'taskboard-userstory-row-0') {
+        taskboard = document.getElementById('backlogtable');
+        taskboard.classList.remove('backlogtarget');
+        taskboard.classList.remove('backlogover');
+        taskboard.removeEventListener('drop', handleToBacklogDrop, false);
+        taskboard.removeEventListener('dragover', handleToBacklogDragOver, false);
+        taskboard.removeEventListener('dragenter', handleToBacklogDragEnter, false);
+        taskboard.removeEventListener('dragleave', handleToBacklogDragLeave, false);
+    }
+
     [].forEach.call(taskboardCells, function (col) {
         col.classList.remove('over');
         col.removeEventListener('drop', handleTaskboardDrop, false);
