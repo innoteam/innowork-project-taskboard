@@ -335,6 +335,138 @@ class InnoworkTaskBoard extends InnoworkItem
 
     /* }}} */
 
+    public function getBoardStructure()
+    {
+        $board = array();
+
+        // InnomaticCore
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
+
+        // Taskboard projects list
+        $projectIdList = self::getProjectsList();
+
+        $innoworkCore = InnoworkCore::instance(
+            'innoworkcore',
+            $innomaticCore->getDataAccess(),
+            $innomaticCore->getCurrentDomain()->getDataAccess()
+        );
+
+        // Get innowork summaries
+        $summaries               = $innoworkCore->getSummaries();
+
+        // Get summaries for user stories item types
+        $userStoriesSummaries    = $innoworkCore->getSummaries('', false, array('userstory'));
+
+        // Get summaries for technical tasks item types
+        $technicalTasksSummaries = $innoworkCore->getSummaries('', false, array('technicaltask'));
+
+        $userStoriesList = array();
+        $taskList = array();
+        $userStoriesTasksList = array();
+
+        // Build user story list
+        foreach ($userStoriesSummaries as $type => $values) {
+            $userStoryClassName = $values['classname'];
+            $tempObject = new $userStoryClassName(
+                $innomaticCore->getDataAccess(),
+                $innomaticCore->getCurrentDomain()->getDataAccess()
+            );
+            foreach ($projectIdList as $projectId) {
+                $searchResults = $tempObject->search(
+                    array('projectid' => $projectId, 'done' => $innomaticCore->getCurrentDomain()->getDataAccess()->fmtfalse),
+                    $innomaticCore->getCurrentUser()->getUserId()
+                );
+                $userStoriesList = array_merge($userStoriesList, $searchResults);
+            }
+        }
+
+        // Build technical task list
+        foreach ($technicalTasksSummaries as $type => $values) {
+            $taskClassName = $values['classname'];
+            $tempObject = new $taskClassName(
+                $innomaticCore->getDataAccess(),
+                $innomaticCore->getCurrentDomain()->getDataAccess()
+            );
+            foreach ($projectIdList as $projectId) {
+                $searchResults = $tempObject->search(
+                    array('projectid' => $projectId, 'done' => $innomaticCore->getCurrentDomain()->getDataAccess()->fmtfalse),
+                    $innomaticCore->getCurrentUser()->getUserId()
+                );
+                $taskList = array_merge($taskList, $searchResults);
+            }
+        }
+
+        // Build user stories task list
+        foreach ($taskList as $id => $values) {
+            if (strlen($values['userstoryid']) && $values['userstoryid'] != 0) {
+                $userStoriesTasksList[$values['userstoryid']][$id] = $values;
+                // Remove this task from the tasks list
+                unset($taskList[$id]);
+            }
+        }
+
+        $board['userstoriestasklist'] = $userStoriesTasksList;
+
+        // Backlog and iteration tasks
+        $backlogTasks = array();
+        $iterationTasks = array();
+
+        foreach ($taskList as $id => $values) {
+            if (!(strlen($values['iterationid']) > 0 && $values['iterationid'] != 0)) {
+                $backlogTasks['task-'.$id] = $values;
+            } else {
+                $iterationTasks[$id] = $values;
+            }
+        }
+
+        $board['iterationtasks'] = $iterationTasks;
+
+        // Backlog and iteration user stories
+        $backlogUserStories = array();
+        $iterationUserStories = array();
+
+        // This keeps track of whole product backlog story points
+        $backlogStoryPoints = 0;
+
+        // This keeps track of whole iteration story points
+        $iterationStoryPoints = 0;
+
+        foreach ($userStoriesList as $id => $values) {
+            if (!(strlen($values['iterationid']) > 0 && $values['iterationid'] != 0)) {
+                $backlogUserStories['userstory-'.$id] = $values;
+                // Add user story points to the backlog story points total
+                $backlogStoryPoints += $values['storypoints'];
+            } else {
+                $iterationUserStories[$id] = $values;
+                // Add user story points to the iteration story points total
+                $iterationStoryPoints += $values['storypoints'];
+            }
+        }
+
+        if (!($iterationStoryPoints > 0)) {
+            $iterationStoryPoints = 0;
+        }
+
+        if (!($backlogStoryPoints > 0)) {
+            $backlogStoryPoints = 0;
+        }
+
+        $board['backlogstorypoints']   = $backlogStoryPoints;
+        $board['iterationstorypoints'] = $iterationStoryPoints;
+
+        $board['iterationuserstories'] = $iterationUserStories;
+
+        // Merge backlog items
+        $backlogItems = array_merge($backlogUserStories, $backlogTasks);
+
+        $board['backlogitems'] = $backlogItems;
+
+        // Task statuses
+        $board['taskstatuslist'] = InnoworkTaskField::getFields(InnoworkTaskField::TYPE_STATUS);
+
+        return $board;
+    }
+
     public function doGetSummary()
     {
         $result = false;
