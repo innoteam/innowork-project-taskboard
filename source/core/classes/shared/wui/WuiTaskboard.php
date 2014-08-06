@@ -165,11 +165,15 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
                 <label>'.$localeCatalog->getstr('close_iteration_button').'</label>
                 <frame>false</frame>
                 <horiz>true</horiz>
+                <needconfirm>true</needconfirm>
+                <confirmmessage></confirmmessage>
                 <action>javascript:void(0)</action>
                 </args>
                   <events>
                   <click>
-                  xajax_WuiTaskboardCloseIteration('.$taskboardId.');
+if (confirm(\''.addslashes($localeCatalog->getStr('close_iteration_confirm')).'\')) {
+    xajax_WuiTaskboardCloseIteration('.$taskboardId.');
+}
                   </click>
                   </events>
             </button>';

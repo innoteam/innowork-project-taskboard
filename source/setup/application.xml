@@ -71,6 +71,7 @@
 
         <permission name="add_taskboards" title="add_taskboards" description="" catalog="innowork-projects-taskboard::roles" defaultroles="seniormanager,projectmanager" />
         <permission name="view_all_taskboards" title="view_all_taskboards" description="" catalog="innowork-projects-taskboard::roles" defaultroles="seniormanager" />
+        <permission name="close_iterations" title="close_iterations" description="" catalog="innowork-projects-taskboard::roles" defaultroles="seniormanager,projectmanager" />
 
 	</components>
 </application>
