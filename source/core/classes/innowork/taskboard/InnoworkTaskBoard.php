@@ -2,9 +2,21 @@
 
 require_once('innowork/core/InnoworkItem.php');
 
+/**
+ * This class handles the taskboard and its operations.
+ *
+ * @uses InnoworkItem
+ * @version //autogen//
+ * @author  Alex Pagnoni <alex.pagnoni@innomatic.io>
+ */
 class InnoworkTaskBoard extends InnoworkItem
 {
-
+    /**
+     * Table of taskboard items.
+     *
+     * @var string
+     * @access public
+     */
     public $mTable         = 'innowork_taskboards';
     public $mNewDispatcher = 'view';
     public $mNewEvent      = 'newtaskboard';
@@ -12,9 +24,22 @@ class InnoworkTaskBoard extends InnoworkItem
     public $mConvertible   = false;
     const ITEM_TYPE        = 'taskboard';
 
-    public function __construct($rrootDb, $rdomainDA, $storyId = 0)
+    /* public __construct($rrootDb, $rdomainDA, $storyId = 0) {{{ */
+    /**
+     * Class constructor.
+     *
+     * During class construction there are some InnoworkItem properties
+     * set to a default value.
+     *
+     * @param \Innomatic\Dataaccess\DataAccess $rrootDb
+     * @param \Innomatic\Dataaccess\DataAccess $rdomainDA
+     * @param int $taskboardId Optional id of the taskboard item
+     * @access public
+     * @return void
+     */
+    public function __construct($rrootDb, $rdomainDA, $taskboardId = 0)
     {
-        parent::__construct($rrootDb, $rdomainDA, self::ITEM_TYPE, $storyId);
+        parent::__construct($rrootDb, $rdomainDA, self::ITEM_TYPE, $taskboardId);
 
         $this->mKeys['title'] = 'text';
         $this->mKeys['done'] = 'boolean';
@@ -28,6 +53,7 @@ class InnoworkTaskBoard extends InnoworkItem
         $this->mShowDispatcher = 'view';
         $this->mShowEvent = 'showtaskboard';
     }
+    /* }}} */
 
     /* public doCreate($params, $userId) {{{ */
     /**

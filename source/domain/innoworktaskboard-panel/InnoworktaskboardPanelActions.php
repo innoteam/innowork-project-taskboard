@@ -92,6 +92,16 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
         $board->trash($innomaticCore->getCurrentUser()->getUserId());
     }
 
+    /* public ajaxAddProject($taskboardId, $projectId) {{{ */
+    /**
+     * Ajax call for adding a project to a taskboard.
+     *
+     * @param integer $taskboardId Destination taskboard id
+     * @param integer $projectId Project id to be added
+     * @static
+     * @access public
+     * @return XajaxResponse
+     */
     public static function ajaxAddProject($taskboardId, $projectId)
     {
         $objResponse = new XajaxResponse();
@@ -105,4 +115,5 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
 
         return $objResponse;
     }
+    /* }}} */
 }
