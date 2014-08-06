@@ -360,6 +360,9 @@ class InnoworkTaskBoard extends InnoworkItem
         // Get summaries for technical tasks item types
         $technicalTasksSummaries = $innoworkCore->getSummaries('', false, array('technicaltask'));
 
+        // Get current iteration id
+        $currentIterationId = self::getCurrentIterationId();
+
         $userStoriesList = array();
         $taskList = array();
         $board['userstoriestasklist'] = array();
@@ -412,7 +415,7 @@ class InnoworkTaskBoard extends InnoworkItem
         foreach ($taskList as $id => $values) {
             if (!(strlen($values['iterationid']) > 0 && $values['iterationid'] != 0)) {
                 $backlogTasks['task-'.$id] = $values;
-            } else {
+            } elseif ($values['iterationid'] == $currentIterationId) {
                 $board['iterationtasks'][$id] = $values;
             }
         }
@@ -432,7 +435,7 @@ class InnoworkTaskBoard extends InnoworkItem
                 $backlogUserStories['userstory-'.$id] = $values;
                 // Add user story points to the backlog story points total
                 $board['backlogstorypoints'] += $values['storypoints'];
-            } else {
+            } elseif ($values['iterationid'] == $currentIterationId) {
                 $board['iterationuserstories'][$id] = $values;
                 // Add user story points to the iteration story points total
                 $board['iterationstorypoints'] += $values['storypoints'];
