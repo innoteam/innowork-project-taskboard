@@ -167,15 +167,16 @@ class InnoworkTaskBoard extends InnoworkItem
     public function getProjectsList()
     {
         $projectsQuery = $this->mrDomainDA->execute(
-            "SELECT projectid"
-            . " FROM innowork_taskboards_projects"
-            . " WHERE taskboardid={$this->mItemId}"
+            "SELECT projectid,name "
+            . "FROM innowork_taskboards_projects AS tkbprj "
+            . "JOIN innowork_projects AS prj ON prj.id = tkbprj.projectid "
+            . "WHERE taskboardid={$this->mItemId}"
             );
 
         $projectsList = array();
 
         while (!$projectsQuery->eof) {
-            $projectsList[] = $projectsQuery->getFields('projectid');
+            $projectsList[$projectsQuery->getFields('projectid')] = $projectsQuery->getFields('name');
             $projectsQuery->moveNext();
         }
         $projectsQuery->free();
