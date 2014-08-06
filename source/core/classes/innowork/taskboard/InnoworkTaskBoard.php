@@ -566,7 +566,7 @@ class InnoworkTaskBoard extends InnoworkItem
                 $innomaticCore->getDataAccess(),
                 $innomaticCore->getCurrentDomain()->getDataAccess()
             );
-            foreach ($projectIdList as $projectId) {
+            foreach ($projectIdList as $projectId => $projectValues) {
                 $searchResults = $tempObject->search(
                     array('projectid' => $projectId, 'done' => $innomaticCore->getCurrentDomain()->getDataAccess()->fmtfalse),
                     $innomaticCore->getCurrentUser()->getUserId()
@@ -582,7 +582,7 @@ class InnoworkTaskBoard extends InnoworkItem
                 $innomaticCore->getDataAccess(),
                 $innomaticCore->getCurrentDomain()->getDataAccess()
             );
-            foreach ($projectIdList as $projectId) {
+            foreach ($projectIdList as $projectId => $projectValues) {
                 $searchResults = $tempObject->search(
                     array('projectid' => $projectId, 'done' => $innomaticCore->getCurrentDomain()->getDataAccess()->fmtfalse),
                     $innomaticCore->getCurrentUser()->getUserId()
