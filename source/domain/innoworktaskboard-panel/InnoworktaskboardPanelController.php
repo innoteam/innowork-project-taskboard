@@ -20,7 +20,7 @@ class InnoworktaskboardPanelController extends \Innomatic\Desktop\Panel\PanelCon
     }
     /* }}} */
 
-    /* public getProjectsList($taskboardId) {{{ */
+    /* public getProjectsListXml($taskboardId) {{{ */
     /**
      * Gets the WUI xml for the taskboard projects list.
      *
@@ -29,7 +29,7 @@ class InnoworktaskboardPanelController extends \Innomatic\Desktop\Panel\PanelCon
      * @access public
      * @return string
      */
-    public static function getProjectsList($taskboardId)
+    public static function getProjectsListXml($taskboardId)
     {
         require_once('innowork/core/InnoworkCore.php');
 
@@ -65,10 +65,22 @@ class InnoworktaskboardPanelController extends \Innomatic\Desktop\Panel\PanelCon
             $row++;
         }
         $xml .= '</children></table>
-            <combobox><args>
+            <grid><children>
+            <combobox row="0" col="0"><args>
                 <id>add_project_id</id>
                 <elements type="array">'.\Shared\Wui\WuiXml::encode($availableProjects).'</elements>
             </args></combobox>
+<button row="0" col="1"><name>add</name>
+                            <events><click>xajax_AddProject('.$taskboardId.', document.getElementById(\'add_project_id\').value);</click></events>
+          <args>
+            <themeimage>mathadd</themeimage>
+            <horiz>true</horiz>
+            <frame>false</frame>
+<label>'.\Shared\Wui\WuiXml::cdata($localeCatalog->getStr('add_project_button')).'</label>
+                            <action>javascript:void(0)</action>
+          </args>
+        </button>
+            </children></grid>
             </children></vertgroup>';
         return $xml;
     }

@@ -438,7 +438,7 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
                   </children>
                 </horizgroup>
 
-<divframe><args><id>settings_projects</id></args><children>'.$this->controller->getProjectsList($taskboardId).'</children></divframe>
+<divframe><args><id>settings_projects</id></args><children>'.$this->controller->getProjectsListXml($taskboardId).'</children></divframe>
 
               </children>
             </vertgroup>

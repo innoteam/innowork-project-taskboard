@@ -91,4 +91,18 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
 
         $board->trash($innomaticCore->getCurrentUser()->getUserId());
     }
+
+    public static function ajaxAddProject($taskboardId, $projectId)
+    {
+        $objResponse = new XajaxResponse();
+        require_once('innowork/core/InnoworkCore.php');
+
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
+        $taskboard = InnoworkCore::getItem('taskboard', $taskboardId);
+        $taskboard->addProject($projectId);
+        $html = WuiXml::getContentFromXml('', \InnoworktaskboardPanelController::getProjectsListXml($taskboardId));
+        $objResponse->addAssign('settings_projects', 'innerHTML', $html);
+
+        return $objResponse;
+    }
 }
