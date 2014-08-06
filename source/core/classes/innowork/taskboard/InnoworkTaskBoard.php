@@ -268,6 +268,142 @@ class InnoworkTaskBoard extends InnoworkItem
     }
     /* }}} */
 
+    /* public closeCurrentIteration() {{{ */
+    /**
+     * Closes the current iteration and opens a new one.
+     *
+     * This method check if there are fully completed tasks and user stories,
+     * sets them as done, archive the current iteration and creates a new
+     * working iteration.
+     *
+     * It also advance any uncompleted item (eg. user stories with no tasks,
+     * user stories with uncompleted tasks, single uncompleted tasks) to the new
+     * iteration.
+     *
+     * @access public
+     * @return boolean True if the iteration has been closed (or if there is no current iteration)
+     */
+    public function closeCurrentIteration()
+    {
+        $iterationQuery = $this->mrDomainDA->execute(
+            'SELECT id
+            FROM innowork_iterations
+            WHERE taskboardid=' . $this->mItemId . '
+            AND done=' . $this->mrDomainDA->formatText($this->mrDomainDA->fmtfalse));
+
+        // If the are no active iterations, just return true
+        if ($iterationQuery->getNumberRows() == 0) {
+            return true;
+        }
+
+        // Get the current iteration id
+        $iterationId = $iterationQuery->getFields('id');
+
+        // Get the board structure in order to find the done stories/tasks
+        $board = self::getBoardStructure();
+
+        // Build end date string
+        $endDateArray = array(
+            'year' => date('Y'),
+            'mon' => date('m'),
+            'mday' => date('d'),
+            'hours' => date('H'),
+            'minutes' => date('i'),
+            'seconds' => date('s')
+        );
+        $endDate = $this->mrDomainDA->getTimestampFromDateArray($endDateArray);
+
+        // Update current iteration setting it as done and adding the end date
+        $this->mrDomainDA->execute(
+            "UPDATE innowork_iterations ".
+            "SET done=".$this->mrDomainDA->formatText($this->mrDomainDA->fmttrue).",".
+            "enddate=".$this->mrDomainDA->formatText($endDate)." ".
+            "WHERE id=$iterationId"
+        );
+
+        // Create a new iteration
+        $newIterationId = self::getCurrentIterationId();
+
+        // Get the task status of the last column (done)
+        $statusQuery = $this->mrDomainDA->execute(
+            "SELECT id ".
+            "FROM innowork_projects_tasks_fields_values ".
+            "WHERE fieldid=".InnoworkTaskField::TYPE_STATUS." ".
+            "ORDER BY fieldvalue DESC ".
+            "LIMIT 1"
+        );
+
+        if ($statusQuery->getNumberRows() == 0) {
+            // There are no task statuses set
+            return false;
+        }
+
+        $doneStatusId = $statusQuery->getFields('id');
+
+        // Update the tasks without user story
+        foreach ($board['iterationtasks'] as $id => $values) {
+            $item = InnoworkCore::getItem('task', $values['id']);
+
+            if ($values['statusid'] == $doneStatusId) {
+                // Leave the task in the old iteration and set it as done
+                $item->edit(array('done' => $this->mrDomainDA->fmttrue));
+            } else {
+                // Move the task to the new iteration
+                $item->edit(array('iterationid' => $newIterationId));
+            }
+            unset($item);
+        }
+
+        // Update the user stories and their tasks
+        foreach ($board['iterationuserstories'] as $storyId => $storyValues) {
+            $userStory = InnoworkCore::getItem('userstory', $storyValues['id']);
+
+            // Set story done default as false, since we should check if
+            // there is at least one technical task (if not, the story is not done)
+            $storyDone = false;
+
+            // Check if all the user story tasks are done
+            if (isset($board['userstoriestasklist'][$storyValues['id']]) and count($board['userstoriestasklist'][$storyValues['id']]) > 0) {
+                // Assume the story is done until we find a not done task
+                $storyDone = true;
+                foreach ($board['userstoriestasklist'][$storyValues['id']] as $taskId => $taskValues) {
+                    // If there is at least one task not done, mark the story as not done too
+                    if ($taskValues['statusid'] != $doneStatusId) {
+                        $storyDone = false;
+                    }
+                }
+            }
+
+            $story = InnoworkCore::getItem('userstory', $storyValues['id']);
+            if ($storyDone == true) {
+                // Set the story tasks as done
+                foreach ($board['userstoriestasklist'][$storyValues['id']] as $taskId => $taskValues) {
+                    $task = InnoworkCore::getItem('task', $taskValues['id']);
+                    $task->edit(array('done' => $this->mrDomainDA->fmttrue));
+                    unset($task);
+                }
+
+                // Set the story as done
+                $story->edit(array('done' => $this->mrDomainDA->fmttrue));
+            } else {
+                // Advance the user story and its tasks to the new iteration
+                if (isset($board['userstoriestasklist'][$storyValues['id']]) and count($board['userstoriestasklist'][$storyValues['id']]) > 0) {
+                    foreach ($board['userstoriestasklist'][$storyValues['id']] as $taskId => $taskValues) {
+                        $task = InnoworkCore::getItem('task', $taskValues['id']);
+                        $task->edit(array('iterationid' => $newIterationId));
+                        unset($task);
+                    }
+                }
+
+                $story->edit(array('iterationid' => $newIterationId));
+            }
+            unset($story);
+        }
+
+        return true;
+    }
+    /* }}} */
+
     public function addTaskToCurrentIteration($taskType, $taskId)
     {
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');

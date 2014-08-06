@@ -62,6 +62,15 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         $taskboard = InnoworkCore::getItem('taskboard', $taskboardId);
         $board = $taskboard->getBoardStructure();
 
+        // Innowork core
+        $innoworkCore = InnoworkCore::instance(
+            'innoworkcore',
+            $innomaticCore->getDataAccess(),
+            $innomaticCore->getCurrentDomain()->getDataAccess()
+        );
+
+        // Get innowork summaries
+        $summaries               = $innoworkCore->getSummaries();
         // Users list
         $usersQuery = $innomaticCore->getCurrentDomain()->getDataAccess()->execute("SELECT id,fname,lname FROM domain_users");
         $usersList = array();
@@ -148,6 +157,24 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             </button>
             ';
 
+        // Add close iteration button if the user has enough permissions
+        if ($innomaticCore->getCurrentUser()->hasPermission('add_taskboards')) {
+            $buttonsXml .= '<button>
+              <args>
+                <themeimage>lock</themeimage>
+                <label>'.$localeCatalog->getstr('close_iteration_button').'</label>
+                <frame>false</frame>
+                <horiz>true</horiz>
+                <action>javascript:void(0)</action>
+                </args>
+                  <events>
+                  <click>
+                  xajax_WuiTaskboardCloseIteration('.$taskboardId.');
+                  </click>
+                  </events>
+            </button>';
+        }
+
         // Add settings button if the user has enough permissions
         if ($innomaticCore->getCurrentUser()->hasPermission('add_taskboards')) {
             $buttonsXml .= '<button>
@@ -217,7 +244,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             $this->mLayout .= '<tr id="taskboard-userstory-row-'.$userStory['id'].'">'."\n";
             $this->mLayout .= '<td id="div-row'.$userStory['id'].'-0" class="cell" style="background-color: white; width: 0%;">
                 <div id="card-userstory-'.$userStory['id'].'" class="card story">
-                <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$userStoriesSummaries['userstory']['label'].' '.$userStory['id'].'</a><br/>'.mb_strimwidth($userStory['title'], 0, 70, '...').
+                <header><a href="'.InnoworkCore::getShowItemAction('userstory', $userStory['id']).'">'.$summaries['userstory']['label'].' '.$userStory['id'].'</a><br/>'.mb_strimwidth($userStory['title'], 0, 70, '...').
                 "<br/><br/>".
                 $storyPoints.
                 "</header>".
@@ -238,7 +265,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
                         if ($taskValues['statusid'] == $statusId) {
                             $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
                                 '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.
-                                $technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a><br/>'.mb_strimwidth($taskValues['title'], 0, 50, '...').
+                                $summaries['task']['label'].' '.$taskValues['id'].'</a><br/>'.mb_strimwidth($taskValues['title'], 0, 50, '...').
                                 "<br/><i>$assignedToLabel</i>".
                                 '</header></div>';
                         }
@@ -270,7 +297,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
                     if ($taskValues['statusid'] == $statusId) {
                         $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
                             '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.
-                            $technicalTasksSummaries['task']['label'].' '.$taskValues['id'].'</a> - '.mb_strimwidth($taskValues['title'], 0, 50, '...').
+                            $summaries['task']['label'].' '.$taskValues['id'].'</a> - '.mb_strimwidth($taskValues['title'], 0, 50, '...').
                             "<br/><i>$assignedToLabel</i>".
                             '</header></div>';
                     }
@@ -398,6 +425,30 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
     public static function ajaxRefreshBoard($taskBoardId)
     {
         $objResponse = new XajaxResponse();
+
+        $xml = '<taskboard><name>taskboard</name><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
+        $html = WuiXml::getContentFromXml('', $xml);
+        $objResponse->addAssign('taskboard_widget', 'innerHTML', $html);
+
+        return $objResponse;
+    }
+    /* }}} */
+
+    /* public ajaxCloseIteration($taskBoardId) {{{ */
+    /**
+     * Ajax call to close the current iteration, archive done stories/tasks
+     * and open a new iteration.
+     *
+     * @param mixed $taskBoardId Taskboard id
+     * @static
+     * @access public
+     * @return XajaxResponse
+     */
+    public static function ajaxCloseIteration($taskBoardId)
+    {
+        $objResponse = new XajaxResponse();
+        $taskboard = InnoworkCore::getItem('taskboard', $taskBoardId);
+        $taskboard->closeCurrentIteration();
 
         $xml = '<taskboard><name>taskboard</name><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
         $html = WuiXml::getContentFromXml('', $xml);
