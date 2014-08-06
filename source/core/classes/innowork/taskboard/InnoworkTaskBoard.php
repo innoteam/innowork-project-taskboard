@@ -199,14 +199,15 @@ class InnoworkTaskBoard extends InnoworkItem
             "SELECT projectid"
             . " FROM innowork_taskboards_projects"
             . " WHERE projectid=$projectId"
-            );
+            . " AND taskboardid={$this->mItemId}"
+        );
 
         if ($projectCheckQuery->getNumberRows() == 0) {
             return $this->mrDomainDA->execute(
                 "INSERT INTO innowork_taskboards_projects"
                 . " (taskboardid, projectid)"
                 . " VALUES({$this->mItemId}, $projectId)"
-                );
+            );
         } else {
             return true;
         }
