@@ -404,6 +404,18 @@ class InnoworkTaskBoard extends InnoworkItem
     }
     /* }}} */
 
+    /* public addTaskToCurrentIteration($taskType, $taskId) {{{ */
+    /**
+     * Adds an item to the current iteration.
+     *
+     * This method accepts Innowork items of any type (userstories, tasks,
+     * etc.).
+     *
+     * @param string $taskType Innowork item type
+     * @param integer $taskId Item id
+     * @access public
+     * @return void
+     */
     public function addTaskToCurrentIteration($taskType, $taskId)
     {
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
@@ -428,7 +440,21 @@ class InnoworkTaskBoard extends InnoworkItem
 
         $tempObject->edit(array('iterationid' => $iterationId));
     }
+    /* }}} */
 
+    /* public removeTaskFromCurrentIteration($taskType, $taskId) {{{ */
+    /**
+     * Removes the given item from the current iteration, sending it back to
+     * the product backlog.
+     *
+     * This method accepts Innowork items of any type (userstories, tasks,
+     * etc.).
+     *
+     * @param string $taskType Innowork item type
+     * @param integer $taskId Item id
+     * @access public
+     * @return void
+     */
     public function removeTaskFromCurrentIteration($taskType, $taskId)
     {
         $innoworkCore = InnoworkCore::instance('innoworkcore', \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(), \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
@@ -446,9 +472,9 @@ class InnoworkTaskBoard extends InnoworkItem
 
         $tempObject->edit(array('iterationid' => 0));
     }
+    /* }}} */
 
     /* public setTaskStatus($taskType, $taskId, $taskStatus) {{{ */
-
     /**
      * Updates the status of the given task.
      *
@@ -468,9 +494,37 @@ class InnoworkTaskBoard extends InnoworkItem
             return false;
         }
     }
-
     /* }}} */
 
+    /* public getBoardStructure() {{{ */
+    /**
+     * Builds the current interation taskboard structure and returns it.
+     *
+     * This method returns a structured array with the following keys:
+     *
+     * taskstatuslist: a complete list of the task statuses, sorted by column
+     * order (done as last one).
+     *
+     * backlogitems: all the items in the product backlog not belonging to an
+     * iteration.
+     *
+     * iterationuserstories: all the user stories in the current iteration.
+     *
+     * userstoriestasklist: all the tasks of the user stories in the current
+     * iteration.
+     *
+     * iterationtasks: all the tasks with no user story in the current
+     * iteration.
+     *
+     * backlogstorypoints: the sum of the user stories points in the product
+     * backlog.
+     *
+     * iterationstorypoints: the sum of the user stories points in the current
+     * iteration.
+     *
+     * @access public
+     * @return array
+     */
     public function getBoardStructure()
     {
         $board = array();
@@ -594,6 +648,7 @@ class InnoworkTaskBoard extends InnoworkItem
 
         return $board;
     }
+    /* }}} */
 
     public function doGetSummary()
     {
