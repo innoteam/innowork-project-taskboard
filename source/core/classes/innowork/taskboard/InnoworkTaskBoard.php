@@ -348,7 +348,7 @@ class InnoworkTaskBoard extends InnoworkItem
 
             if ($values['statusid'] == $doneStatusId) {
                 // Leave the task in the old iteration and set it as done
-                $item->edit(array('done' => $this->mrDomainDA->fmttrue));
+                $item->edit(array('done' => 'true'));
             } else {
                 // Move the task to the new iteration
                 $item->edit(array('iterationid' => $newIterationId));
@@ -379,14 +379,16 @@ class InnoworkTaskBoard extends InnoworkItem
             $story = InnoworkCore::getItem('userstory', $storyValues['id']);
             if ($storyDone == true) {
                 // Set the story tasks as done
-                foreach ($board['userstoriestasklist'][$storyValues['id']] as $taskId => $taskValues) {
-                    $task = InnoworkCore::getItem('task', $taskValues['id']);
-                    $task->edit(array('done' => $this->mrDomainDA->fmttrue));
-                    unset($task);
+                if (isset($board['userstoriestasklist'][$storyValues['id']]) and count($board['userstoriestasklist'][$storyValues['id']]) > 0) {
+                    foreach ($board['userstoriestasklist'][$storyValues['id']] as $taskId => $taskValues) {
+                        $task = InnoworkCore::getItem('task', $taskValues['id']);
+                        $task->edit(array('done' => 'true'));
+                        unset($task);
+                    }
                 }
 
                 // Set the story as done
-                $story->edit(array('done' => $this->mrDomainDA->fmttrue));
+                $story->edit(array('done' => 'true'));
             } else {
                 // Advance the user story and its tasks to the new iteration
                 if (isset($board['userstoriestasklist'][$storyValues['id']]) and count($board['userstoriestasklist'][$storyValues['id']]) > 0) {
