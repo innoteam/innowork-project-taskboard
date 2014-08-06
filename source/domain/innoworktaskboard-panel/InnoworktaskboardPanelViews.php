@@ -390,7 +390,7 @@ class InnoworktaskboardPanelViews extends \Innomatic\Desktop\Panel\PanelViews
         $headers[0]['label'] = $this->localeCatalog->getStr('taskboard_settings_header').(strlen($taskboardData['title']) ? ' - '.$taskboardData['title'] : '');
         $headers[0]['link'] = \Innomatic\Wui\Dispatch\WuiEventsCall::buildEventsCallString(
                 '',
-                array(array('view', 'default', array('taskboardid' => $eventData['id'])))
+                array(array('view', 'default', array('taskboardid' => $taskboardId)))
             );
 
         $this->xml = '<horizgroup><children>
