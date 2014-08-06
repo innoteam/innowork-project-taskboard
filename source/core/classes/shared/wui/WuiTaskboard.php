@@ -53,14 +53,21 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         $taskboardId = $this->mArgs['taskboardid'];
 
         // Widget locale catalog
-        $localeCatalog = new LocaleCatalog(
+        $localeCatalog = new \Innomatic\Locale\LocaleCatalog(
             'innowork-projects-taskboard::widget',
             $innomaticCore->getCurrentUser()->getLanguage()
+        );
+
+        $localeCountry = new \Innomatic\Locale\LocaleCountry(
+            $innomaticCore->getCurrentUser()->getCountry()
         );
 
         // Taskboard object
         $taskboard = InnoworkCore::getItem('taskboard', $taskboardId);
         $board = $taskboard->getBoardStructure();
+
+        // Closed iterations list
+        $closedIterationsList = $taskboard->getClosedIterationsList();
 
         // Innowork core
         $innoworkCore = InnoworkCore::instance(
@@ -319,8 +326,19 @@ if (confirm(\''.addslashes($localeCatalog->getStr('close_iteration_confirm')).'\
 </td><td style="width: 200px; vertical-align: top;">
 <table>
 <tr>
-<td>'.$localeCatalog->getStr('increments.label').'</td>
+<td>'.$localeCatalog->getStr('increments.label').' - '.
+sprintf($localeCatalog->getStr('closed_iterations_sp'), $closedIterationsList['storypoints']).'</td>
 </tr>
+</table>
+<table>
+';
+
+foreach ($closedIterationsList['iterations'] as $closedIterationId => $closedIterationValues) {
+    $this->mLayout .= '<tr><td>'.$localeCountry->formatShortArrayDate($closedIterationValues['enddate']).
+        ' - '.sprintf($localeCatalog->getStr('closed_iteration_sp'), $closedIterationValues['storypoints']).'</td></tr>';
+}
+
+$this->mLayout .= '
 </table>
         </td>
     </tr>

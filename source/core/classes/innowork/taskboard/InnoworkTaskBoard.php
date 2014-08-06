@@ -650,6 +650,63 @@ class InnoworkTaskBoard extends InnoworkItem
     }
     /* }}} */
 
+    /* public getClosedIterationsList() {{{ */
+    /**
+     * Builds a list of the closed iterations and returns it.
+     *
+     * This method will also calculate the delivered story points for each
+     * iteration and the sum of all delivered story points.
+     *
+     * This method returns an array with the following structure:
+     * - storypoints: sum of the closed iterations story points
+     * - iterations: sub array with an item for each iteration
+     *
+     * @access public
+     * @return array
+     */
+    public function getClosedIterationsList()
+    {
+        $iterationsList = array();
+
+        // Extract closed iterations
+        $iterationsQuery = $this->mrDomainDA->execute(
+            "SELECT id, startdate, enddate ".
+            "FROM innowork_iterations ".
+            "WHERE taskboardid={$this->mItemId} ".
+            "AND done=".$this->mrDomainDA->formatText($this->mrDomainDA->fmttrue)
+        );
+
+        // Build iterations list
+        $storyItem = InnoworkCore::getItem('userstory');
+        $iterationsList['storypoints'] = 0;
+
+        while (!$iterationsQuery->eof) {
+            // Iteration story points
+            $iterationStoryPoints = 0;
+            $storySearch = $storyItem->search(array('iterationid' => $iterationsQuery->getFields('id')));
+
+            foreach ($storySearch as $storyValues) {
+                $iterationStoryPoints += $storyValues['storypoints'];
+            }
+
+            // Iteration array
+            $iterationsList['iterations'][$iterationsQuery->getFields('id')] = array(
+                'id' => $iterationsQuery->getFields('id'),
+                'startdate' => $this->mrDomainDA->getDateArrayFromTimestamp($iterationsQuery->getFields('startdate')),
+                'enddate' => $this->mrDomainDA->getDateArrayFromTimestamp($iterationsQuery->getFields('enddate')),
+                'storypoints' => $iterationStoryPoints
+            );
+
+            // Increase total closed iterations story points
+            $iterationsList['storypoints'] += $iterationStoryPoints;
+
+            $iterationsQuery->moveNext();
+        }
+
+        return $iterationsList;
+    }
+    /* }}} */
+
     public function doGetSummary()
     {
         $result = false;
