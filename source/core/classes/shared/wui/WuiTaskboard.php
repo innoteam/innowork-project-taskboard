@@ -158,7 +158,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
             ';
 
         // Add close iteration button if the user has enough permissions
-        if ($innomaticCore->getCurrentUser()->hasPermission('add_taskboards')) {
+        if ($innomaticCore->getCurrentUser()->hasPermission('close_iterations')) {
             $buttonsXml .= '<button>
               <args>
                 <themeimage>lock</themeimage>
@@ -447,8 +447,14 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
     public static function ajaxCloseIteration($taskBoardId)
     {
         $objResponse = new XajaxResponse();
-        $taskboard = InnoworkCore::getItem('taskboard', $taskBoardId);
-        $taskboard->closeCurrentIteration();
+
+        // InnomaticCore
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
+
+        if ($innomaticCore->getCurrentUser()->hasPermission('close_iterations')) {
+            $taskboard = InnoworkCore::getItem('taskboard', $taskBoardId);
+            $taskboard->closeCurrentIteration();
+        }
 
         $xml = '<taskboard><name>taskboard</name><args><taskboardid>'.$taskBoardId.'</taskboardid></args></taskboard>';
         $html = WuiXml::getContentFromXml('', $xml);
