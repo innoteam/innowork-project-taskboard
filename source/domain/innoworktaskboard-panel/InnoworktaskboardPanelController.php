@@ -62,6 +62,16 @@ class InnoworktaskboardPanelController extends \Innomatic\Desktop\Panel\PanelCon
         $row = 0;
         foreach ($projectsList as $projectId => $projectName) {
             $xml .= '<label row="'.$row.'" col="0"><args><label>'.\Shared\Wui\WuiXml::cdata($projectName).'</label></args></label>';
+            $xml .= '<button row="'.$row.'" col="1"><name>add</name>
+                <events><click>xajax_RemoveProject('.$taskboardId.', '.$projectId.');</click></events>
+          <args>
+            <themeimage>mathsub</themeimage>
+            <horiz>true</horiz>
+            <frame>false</frame>
+<label>'.\Shared\Wui\WuiXml::cdata($localeCatalog->getStr('remove_project_button')).'</label>
+                            <action>javascript:void(0)</action>
+          </args>
+        </button>';
             $row++;
         }
         $xml .= '</children></table>

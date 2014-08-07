@@ -116,4 +116,30 @@ class InnoworktaskboardPanelActions extends \Innomatic\Desktop\Panel\PanelAction
         return $objResponse;
     }
     /* }}} */
+
+    /* public ajaxRemoveProject($taskboardId, $projectId) {{{ */
+    /**
+     * Ajax call to remove a project from the taskboard.
+     *
+     * @param integer $taskboardId Destination taskboard id
+     * @param integer $projectId Project id to be added
+     * @static
+     * @access public
+     * @return XajaxResponse
+     */
+    public static function ajaxRemoveProject($taskboardId, $projectId)
+    {
+        $objResponse = new XajaxResponse();
+        require_once('innowork/core/InnoworkCore.php');
+
+        $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
+        $taskboard = InnoworkCore::getItem('taskboard', $taskboardId);
+        $taskboard->removeProject($projectId);
+        $html = WuiXml::getContentFromXml('', \InnoworktaskboardPanelController::getProjectsListXml($taskboardId));
+        $objResponse->addAssign('settings_projects', 'innerHTML', $html);
+
+        return $objResponse;
+    }
+    /* }}} */
+
 }
