@@ -75,7 +75,7 @@ class InnoworkTaskBoard extends InnoworkItem
         }
 
         if (count($params)) {
-            $item_id = $this->mrDomainDA->getNextSequenceValue($this->mTable . '_id_seq');
+            $item_id = $this->mrDomainDA->getNextSequenceValue($this->mTable.'_id_seq');
 
             $params['trashed'] = $this->mrDomainDA->fmtfalse;
 
@@ -89,8 +89,8 @@ class InnoworkTaskBoard extends InnoworkItem
                     case 'title':
                     case 'done':
                     case 'trashed':
-                        $keys .= $key_pre . $key;
-                        $values .= $value_pre . $this->mrDomainDA->formatText($val);
+                        $keys .= $key_pre.$key;
+                        $values .= $value_pre.$this->mrDomainDA->formatText($val);
                         break;
 
                     default:
@@ -141,7 +141,7 @@ class InnoworkTaskBoard extends InnoworkItem
                                 if (!$start) {
                                     $update_str .= ',';
                                 }
-                                $update_str .= $field . '=' . $this->mrDomainDA->formatText($value);
+                                $update_str .= $field.'='.$this->mrDomainDA->formatText($value);
                                 $start = 0;
                                 break;
 
@@ -391,7 +391,10 @@ class InnoworkTaskBoard extends InnoworkItem
             $storyDone = false;
 
             // Check if all the user story tasks are done
-            if (isset($board['userstoriestasklist'][$storyValues['id']]) and count($board['userstoriestasklist'][$storyValues['id']]) > 0) {
+            if (
+                isset($board['userstoriestasklist'][$storyValues['id']])
+                and count($board['userstoriestasklist'][$storyValues['id']]) > 0
+            ) {
                 // Assume the story is done until we find a not done task
                 $storyDone = true;
                 foreach ($board['userstoriestasklist'][$storyValues['id']] as $taskId => $taskValues) {
@@ -405,7 +408,10 @@ class InnoworkTaskBoard extends InnoworkItem
             $story = InnoworkCore::getItem('userstory', $storyValues['id']);
             if ($storyDone == true) {
                 // Set the story tasks as done
-                if (isset($board['userstoriestasklist'][$storyValues['id']]) and count($board['userstoriestasklist'][$storyValues['id']]) > 0) {
+                if (
+                    isset($board['userstoriestasklist'][$storyValues['id']])
+                    and count($board['userstoriestasklist'][$storyValues['id']]) > 0
+                ) {
                     foreach ($board['userstoriestasklist'][$storyValues['id']] as $taskId => $taskValues) {
                         $task = InnoworkCore::getItem('task', $taskValues['id']);
                         $task->edit(array('done' => 'true'));
@@ -417,7 +423,10 @@ class InnoworkTaskBoard extends InnoworkItem
                 $story->edit(array('done' => 'true'));
             } else {
                 // Advance the user story and its tasks to the new iteration
-                if (isset($board['userstoriestasklist'][$storyValues['id']]) and count($board['userstoriestasklist'][$storyValues['id']]) > 0) {
+                if (
+                    isset($board['userstoriestasklist'][$storyValues['id']])
+                    and count($board['userstoriestasklist'][$storyValues['id']]) > 0
+                ) {
                     foreach ($board['userstoriestasklist'][$storyValues['id']] as $taskId => $taskValues) {
                         $task = InnoworkCore::getItem('task', $taskValues['id']);
                         $task->edit(array('iterationid' => $newIterationId));
@@ -465,7 +474,9 @@ class InnoworkTaskBoard extends InnoworkItem
         }
 
         $tempObject = new $taskClassName(
-                $innomaticCore->getDataAccess(), $innomaticCore->getCurrentDomain()->getDataAccess(), $taskId
+            $innomaticCore->getDataAccess(),
+            $innomaticCore->getCurrentDomain()->getDataAccess(),
+            $taskId
         );
 
         $tempObject->edit(array('iterationid' => $iterationId));
@@ -487,7 +498,10 @@ class InnoworkTaskBoard extends InnoworkItem
      */
     public function removeTaskFromCurrentIteration($taskType, $taskId)
     {
-        $innoworkCore = InnoworkCore::instance('innoworkcore', \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(), \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+        $innoworkCore = InnoworkCore::instance(
+            'innoworkcore',
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
         );
         $summaries = $innoworkCore->getSummaries();
 
@@ -497,7 +511,9 @@ class InnoworkTaskBoard extends InnoworkItem
         }
 
         $tempObject = new $taskClassName(
-                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(), \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(), $taskId
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess(),
+            $taskId
         );
 
         $tempObject->edit(array('iterationid' => 0));
@@ -742,8 +758,10 @@ class InnoworkTaskBoard extends InnoworkItem
         $result = false;
 
         $userstories = new InnoworkTaskBoard(
-                \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(), \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
+            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
         );
+
         $userstories_search = $userstories->Search(
                 array(
             'done' => \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()->fmtfalse
