@@ -84,7 +84,7 @@
 }
 
 #taskboard .card.task.impediment {
-    background-color: red;
+    background-color: #e93f33;
 }
 
 #taskboard .cell.over {
