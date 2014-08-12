@@ -274,7 +274,13 @@ if (confirm(\''.addslashes($localeCatalog->getStr('close_iteration_confirm')).'\
                         }
 
                         if ($taskValues['statusid'] == $statusId) {
-                            $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
+                            if ($taskValues['impediment'] == $innomaticCore->getCurrentDomain()->getDataAccess()->fmttrue) {
+                                $impediment = ' impediment';
+                            } else {
+                                $impediment = '';
+                            }
+
+                            $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task'.$impediment.'" draggable="true">'.
                                 '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.
                                 $summaries['task']['label'].' '.$taskValues['id'].'</a><br/>'.mb_strimwidth($taskValues['title'], 0, 50, '...').
                                 "<br/><i>$assignedToLabel</i>".
@@ -306,7 +312,13 @@ if (confirm(\''.addslashes($localeCatalog->getStr('close_iteration_confirm')).'\
                     }
 
                     if ($taskValues['statusid'] == $statusId) {
-                        $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task" draggable="true">'.
+                        if ($taskValues['impediment'] == $innomaticCore->getCurrentDomain()->getDataAccess()->fmttrue) {
+                            $impediment = ' impediment';
+                        } else {
+                            $impediment = '';
+                        }
+
+                        $this->mLayout .= '<div id="card-task-'.$taskValues['id'].'" class="card task'.$impediment.'" draggable="true">'.
                             '<header><a href="'.InnoworkCore::getShowItemAction('task', $taskValues['id']).'">'.
                             $summaries['task']['label'].' '.$taskValues['id'].'</a><br/>'.mb_strimwidth($taskValues['title'], 0, 50, '...').
                             "<br/><i>$assignedToLabel</i>".

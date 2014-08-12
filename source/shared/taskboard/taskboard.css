@@ -83,6 +83,10 @@
     border-top-right-radius: 4px;
 }
 
+#taskboard .card.task.impediment {
+    background-color: red;
+}
+
 #taskboard .cell.over {
     border: 1px dashed #000;
     background-color: #f1f1f1;
