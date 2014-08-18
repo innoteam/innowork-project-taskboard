@@ -17,12 +17,44 @@ class InnoworkTaskBoard extends InnoworkItem
      * @var string
      * @access public
      */
-    public $mTable         = 'innowork_taskboards';
+    public $mTable = 'innowork_taskboards';
+    /**
+     * Dispatcher name for new item action.
+     *
+     * @var string
+     * @access public
+     */
     public $mNewDispatcher = 'view';
-    public $mNewEvent      = 'newtaskboard';
-    public $mNoTrash       = false;
-    public $mConvertible   = false;
-    const ITEM_TYPE        = 'taskboard';
+    /**
+     * Dispatcher event name for new item action.
+     *
+     * @var string
+     * @access public
+     */
+    public $mNewEvent = 'newtaskboard';
+    /**
+     * Sets item no trash property.
+     *
+     * Defaults to false since taskboards can be trashed.
+     *
+     * @var bool
+     * @access public
+     */
+    public $mNoTrash = false;
+    /**
+     * Sets item convertibility property.
+     *
+     * Defaults to false since taskboard should not be converted to other
+     * Innowork item types.
+     *
+     * @var bool
+     * @access public
+     */
+    public $mConvertible = false;
+    /**
+     * Innowork item type constant.
+     */
+    const ITEM_TYPE = 'taskboard';
 
     /* public __construct($rrootDb, $rdomainDA, $storyId = 0) {{{ */
     /**
@@ -115,6 +147,13 @@ class InnoworkTaskBoard extends InnoworkItem
     }
     /* }}} */
 
+    /* public doEdit($params) {{{ */
+    /**
+     * Executes taskboard edit actions.
+     *
+     * @param array $params Array of taskboard attributes to be updated
+     * @return boolean
+     */
     public function doEdit($params)
     {
         $result = false;
@@ -165,12 +204,31 @@ class InnoworkTaskBoard extends InnoworkItem
 
         return $result;
     }
+    /* }}} */
 
+    /* public doTrash() {{{ */
+    /**
+     * Executes taskboard trash action.
+     *
+     * Defaults to Innowork standard item trash action.
+     *
+     * @access public
+     * @return boolean
+     */
     public function doTrash()
     {
         return true;
     }
+    /* }}} */
 
+    /* public doRemove($userId) {{{ */
+    /**
+     * Execute taskboard remove action.
+     *
+     * @param integer $userId User that executes the trash action
+     * @access public
+     * @return boolean
+     */
     public function doRemove($userId)
     {
         $result = false;
@@ -182,6 +240,7 @@ class InnoworkTaskBoard extends InnoworkItem
 
         return $result;
     }
+    /* }}} */
 
     /* public getProjectsList() {{{ */
     /**
