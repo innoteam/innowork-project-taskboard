@@ -77,7 +77,7 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         );
 
         // Get innowork summaries
-        $summaries               = $innoworkCore->getSummaries();
+        $summaries = $innoworkCore->getSummaries();
         // Users list
         $usersQuery = $innomaticCore->getCurrentDomain()->getDataAccess()->execute("SELECT id,fname,lname FROM domain_users");
         $usersList = array();
@@ -234,7 +234,7 @@ if (confirm(\''.addslashes($localeCatalog->getStr('close_iteration_confirm')).'\
             $this->mLayout .= '<td valign="top" width="'.$cellWidth.'%"><table cellpadding="4" cellspacing="1" width="100%"><tr>';
             $this->mLayout .= '<td></td>';
             $this->mLayout .= '<td width="100%" valign="top" align="center" bgcolor="' . $this->mThemeHandler->mColorsSet['tables']['headerbgcolor'] . '">' .
-            $status . "</td>\n";
+            $status . " ({$board['taskstatuscounter'][$id]})" . "</td>\n";
             $this->mLayout .= '</tr></table></td>';
         }
 

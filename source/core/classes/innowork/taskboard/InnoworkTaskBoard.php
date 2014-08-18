@@ -599,6 +599,15 @@ class InnoworkTaskBoard extends InnoworkItem
         // Get current iteration id
         $currentIterationId = self::getCurrentIterationId();
 
+        // Task statuses
+        $board['taskstatuslist'] = InnoworkTaskField::getFields(InnoworkTaskField::TYPE_STATUS);
+
+        // Task counter by status
+        foreach ($board['taskstatuslist'] as $statusId => $statusLabel) {
+            // Set each status counter to zero by default
+            $board['taskstatuscounter'][$statusId] = 0;
+        }
+
         $userStoriesList = array();
         $taskList = array();
         $board['userstoriestasklist'] = array();
@@ -639,6 +648,14 @@ class InnoworkTaskBoard extends InnoworkItem
         foreach ($taskList as $id => $values) {
             if (strlen($values['userstoryid']) && $values['userstoryid'] != 0) {
                 $board['userstoriestasklist'][$values['userstoryid']][$id] = $values;
+
+                foreach ($userStoriesList as $storyValues) {
+                    if ($storyValues['id'] == $values['userstoryid'] && $storyValues['iterationid'] == $currentIterationId) {
+                        // Increase the status counter
+                        $board['taskstatuscounter'][$values['statusid']]++;
+                    }
+                }
+
                 // Remove this task from the tasks list
                 unset($taskList[$id]);
             }
@@ -653,6 +670,9 @@ class InnoworkTaskBoard extends InnoworkItem
                 $backlogTasks['task-'.$id] = $values;
             } elseif ($values['iterationid'] == $currentIterationId) {
                 $board['iterationtasks'][$id] = $values;
+
+                // Increase the status counter
+                $board['taskstatuscounter'][$values['statusid']]++;
             }
         }
 
@@ -688,9 +708,6 @@ class InnoworkTaskBoard extends InnoworkItem
 
         // Merge backlog items
         $board['backlogitems'] = array_merge($backlogUserStories, $backlogTasks);
-
-        // Task statuses
-        $board['taskstatuslist'] = InnoworkTaskField::getFields(InnoworkTaskField::TYPE_STATUS);
 
         return $board;
     }
