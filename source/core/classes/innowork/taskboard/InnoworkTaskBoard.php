@@ -829,48 +829,4 @@ class InnoworkTaskBoard extends InnoworkItem
     }
     /* }}} */
 
-    public function doGetSummary()
-    {
-        $result = false;
-
-        $userstories = new InnoworkTaskBoard(
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
-            \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
-        );
-
-        $userstories_search = $userstories->Search(
-                array(
-            'done' => \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()->fmtfalse
-                ), \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentUser()->getUserId(), false, false, 10, 0
-        );
-
-        $result = '<vertgroup>
-  <children>';
-
-        foreach ($userstories_search as $story) {
-            $result .=
-                    '<link>
-  <args>
-    <label type="encoded">' . urlencode('- ' . $story['id']) . '</label>
-    <link type="encoded">' . urlencode(
-                            WuiEventsCall::buildEventsCallString('innoworktaskboard', array(
-                                array(
-                                    'view',
-                                    'showtaskboard',
-                                    array('id' => $story['id'])
-                                )
-                            ))
-                    ) . '</link>
-    <compact>true</compact>
-  </args>
-</link>';
-        }
-
-        $result .=
-                '  </children>
-</vertgroup>';
-
-        return $result;
-    }
-
 }
