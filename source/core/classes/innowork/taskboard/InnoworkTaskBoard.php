@@ -6,7 +6,6 @@ require_once('innowork/core/InnoworkItem.php');
  * This class handles the taskboard and its operations.
  *
  * @uses InnoworkItem
- * @version //autogen//
  * @author  Alex Pagnoni <alex.pagnoni@innomatic.io>
  */
 class InnoworkTaskBoard extends InnoworkItem
@@ -519,8 +518,8 @@ class InnoworkTaskBoard extends InnoworkItem
         $innomaticCore = \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer');
         $iterationId = $this->getCurrentIterationId();
 
-        $innoworkCore = InnoworkCore::instance(
-            'innoworkcore',
+        $innoworkCore = \Innowork\Core\InnoworkCore::instance(
+            '\Innowork\Core\InnoworkCore',
             $innomaticCore->getDataAccess(),
             $innomaticCore->getCurrentDomain()->getDataAccess()
         );
@@ -557,8 +556,8 @@ class InnoworkTaskBoard extends InnoworkItem
      */
     public function removeTaskFromCurrentIteration($taskType, $taskId)
     {
-        $innoworkCore = InnoworkCore::instance(
-            'innoworkcore',
+        $innoworkCore = \Innowork\Core\InnoworkCore::instance(
+            '\Innowork\Core\InnoworkCore',
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getDataAccess(),
             \Innomatic\Core\InnomaticContainer::instance('\Innomatic\Core\InnomaticContainer')->getCurrentDomain()->getDataAccess()
         );
@@ -640,8 +639,8 @@ class InnoworkTaskBoard extends InnoworkItem
         // Taskboard projects list
         $projectIdList = self::getProjectsList();
 
-        $innoworkCore = InnoworkCore::instance(
-            'innoworkcore',
+        $innoworkCore = \Innowork\Core\InnoworkCore::instance(
+            '\Innowork\Core\InnoworkCore',
             $innomaticCore->getDataAccess(),
             $innomaticCore->getCurrentDomain()->getDataAccess()
         );

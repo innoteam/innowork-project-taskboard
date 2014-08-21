@@ -70,8 +70,8 @@ class WuiTaskboard extends \Innomatic\Wui\Widgets\WuiWidget
         $closedIterationsList = $taskboard->getClosedIterationsList();
 
         // Innowork core
-        $innoworkCore = InnoworkCore::instance(
-            'innoworkcore',
+        $innoworkCore = \Innowork\Core\InnoworkCore::instance(
+            '\Innowork\Core\InnoworkCore',
             $innomaticCore->getDataAccess(),
             $innomaticCore->getCurrentDomain()->getDataAccess()
         );
